@@ -33,7 +33,16 @@ class BMF:
 		soap = BeautifulSoup(response.text, "html.parser")
 		tables = soap.find("table")
 
-		contracts = [re.sub(r"\s{2,}", "", contract.text) for contract in tables.findAll("caption")]
+		for contract in tables.findAll("caption"):
+			print(re.sub(r"\s{2,}", "", contract.text))
+
+		print()
+
+		for tbody in tables.findAll("tbody"):
+			print(([temp for temp in tbody.find("tr", recursive=False).text.split("\n") if temp != ""]))
+
+		exit()
+
 		j = 0
 		rows = [re.sub(r"\s{2,}", "", contract.text) for contract in tables.findAll("td")]
 		for row in rows:
