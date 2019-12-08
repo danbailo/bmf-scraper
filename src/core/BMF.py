@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import csv
 import re
+import os
 
 class BMF:
 	def __init__(self, url, data):
@@ -22,6 +23,10 @@ class BMF:
 		response = requests.post(self.url, data=self.data, verify=False)
 		return response
 
+	def get_filters(self, path):
+		with open(path) as file:
+			self.filters = [re.sub(r"\n", "", filter_) for filter_ in file.readlines()]
+
 	def get_data(self):
 		print("Requisitando dados...")
 		while True:
@@ -30,16 +35,39 @@ class BMF:
 				break
 			except Exception:
 				continue
-		soap = BeautifulSoup(response.text, "html.parser")
-		tables = soap.find("table")
+		soup = BeautifulSoup(response.text, "html.parser")
+		contracts = []
+		for contract in soup.findAll("caption"):
+			temp = re.sub(r"\s{2,}", "", contract.text)
+			if temp in self.filters:
+				contracts.append(temp)
+		tds = soup.findAll("td")
 
-		for contract in tables.findAll("caption"):
-			print(re.sub(r"\s{2,}", "", contract.text))
-
-		print()
-
-		for tbody in tables.findAll("tbody"):
-			print(([temp for temp in tbody.find("tr", recursive=False).text.split("\n") if temp != ""]))
+		data = {}
+		contract = contracts.pop(0)
+		
+		i = 0
+		while i < len(tds):
+			if len(contracts) == 0: break
+			if i % 5 == 0:
+				participant = re.sub(r"\s{2,}", "", tds[i].text)
+				data[contract] = {}
+				if participant not in data[contract].keys():
+					print("aqui",participant)
+					data[contract][participant] = []
+				i += 1
+				continue
+			data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i].text))
+			print(re.sub(r"\s{2,}", "", tds[i].text))
+			print(data, i)
+			if participant == "Total":
+				data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i+1].text))
+				data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i+2].text))
+				data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i+3].text))
+				contract = contracts.pop(0)
+				i += 4 #salta o i para a proxima tabela
+				continue
+			i += 1
 
 		exit()
 
