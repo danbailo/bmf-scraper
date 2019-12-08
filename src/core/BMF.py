@@ -36,27 +36,25 @@ class BMF:
 		contracts = [re.sub(r"\s{2,}", "", contract.text) for contract in tables.findAll("caption")]
 		j = 0
 		rows = [re.sub(r"\s{2,}", "", contract.text) for contract in tables.findAll("td")]
-		
+		for row in rows:
+			print(row, end=" ")
+			j+=1
+			if j%5==0: print()
+		exit()
 		with open('bmf.csv', mode='w') as csv_file:
 			writer = csv.DictWriter(csv_file, fieldnames=self.fields, delimiter=";")
 			writer.writeheader()	
 
-			for i in range(0,len(rows)):
+			for i in range(0, len(rows), 5):
 				try:
 					if i % 5 == 0:
 						contract = contracts[j]
-						participant = rows[i]
-						longcontracts = rows[i+1]
-						long = re.sub(r",", ".", rows[i+2])
-						shortcontracts = rows[i+3]
-						short = re.sub(r",", ".", rows[i+4])
 						j += 1
-					print(participant)
-					print(longcontracts)
-					print(long)
-					print(shortcontracts)
-					print(short)
-
+					participant = rows[i]
+					longcontracts = rows[i+1]
+					long = re.sub(r",", ".", rows[i+2])
+					shortcontracts = rows[i+3]
+					short = re.sub(r",", ".", rows[i+4])						
 					writer.writerow({
 						'IDENTIFICADOR': self.data["dData1"] + "_" + contract + "_" + participant,
 						'DATA': self.data["dData1"] ,
@@ -67,7 +65,8 @@ class BMF:
 						'SHORTCONTRACTS': shortcontracts,
 						'SHORT%': short,
 						'SALDO': str(eval(long + "-" + short))
-					})	
+					})						
+
 				except Exception as err:
 					print("Entrei aq", err)
-					#break
+					break
