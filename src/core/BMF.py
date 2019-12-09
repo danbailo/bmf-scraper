@@ -3,6 +3,8 @@ import requests
 import csv
 import re
 import os
+from collections import defaultdict
+import json
 
 class BMF:
 	def __init__(self, url, data):
@@ -41,9 +43,12 @@ class BMF:
 			temp = re.sub(r"\s{2,}", "", contract.text)
 			if temp in self.filters:
 				contracts.append(temp)
+
+		contracts = [re.sub(r"\s{2,}", "", contract.text) for contract in soup.findAll("caption")]
+
 		tds = soup.findAll("td")
 
-		data = {}
+		data = defaultdict(lambda: defaultdict(list))
 		contract = contracts.pop(0)
 		
 		i = 0
@@ -51,15 +56,9 @@ class BMF:
 			if len(contracts) == 0: break
 			if i % 5 == 0:
 				participant = re.sub(r"\s{2,}", "", tds[i].text)
-				data[contract] = {}
-				if participant not in data[contract].keys():
-					print("aqui",participant)
-					data[contract][participant] = []
 				i += 1
 				continue
 			data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i].text))
-			print(re.sub(r"\s{2,}", "", tds[i].text))
-			print(data, i)
 			if participant == "Total":
 				data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i+1].text))
 				data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i+2].text))
@@ -68,6 +67,8 @@ class BMF:
 				i += 4 #salta o i para a proxima tabela
 				continue
 			i += 1
+
+		print(json.dumps(data,indent=4))
 
 		exit()
 
