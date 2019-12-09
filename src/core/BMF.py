@@ -51,9 +51,25 @@ class BMF:
 				continue
 			i += 1
 	
-	def get_filtered_data(self, filters):
-		filtered_data = {}
+	def get_prepared_data(self, filters):
+		prepared_data = defaultdict(lambda: defaultdict(list))
 		for contract in filters:
-			if contract in self.data:
-				filtered_data[contract] = self.data[contract].copy()
-		return filtered_data
+			for k,v in self.data[contract].items():
+				participant = k
+				identifier = re.sub(r"/", "", self.date["dData1"]) + "_" + contract + "_" + participant
+				date = self.date["dData1"]
+				longcontracts = re.sub(r",", ".", v[0])
+				long = v[1]
+				shortcontracts = re.sub(r",", ".", v[2])
+				short = v[3]
+				balance = str(eval(longcontracts + "-" + shortcontracts))
+				prepared_data[contract]['IDENTIFICADOR'].append(identifier)
+				prepared_data[contract]['DATA'].append(date)
+				prepared_data[contract]['DERIVATIVO'].append(contract)
+				prepared_data[contract]['PARTICIPANTE'].append(participant)
+				prepared_data[contract]['LONGCONTRACTS'].append(v[0])
+				prepared_data[contract]['LONG_'].append(long)
+				prepared_data[contract]['SHORTCONTRACTS'].append(v[2])
+				prepared_data[contract]['SHORT_'].append(short)
+				prepared_data[contract]['SALDO'].append(balance)
+		return prepared_data
