@@ -1,47 +1,31 @@
 import csv
-import json
 import os
 import re
 
 class CSV:
-	def __init__(self, data, date, filter_, path = os.path.join("..","csv","")):
-		self.fields = [
-			"IDENTIFICADOR",
-			"DATA",
-			"DERIVATIVO",
-			"PARTICIPANTE",
-			"LONGCONTRACTS",
-			"LONG%",
-			"SHORTCONTRACTS",
-			"SHORT%",
-			"SALDO"]		
+	def __init__(self, data, path = os.path.join("..","csv","")):
 		self.data = data
-		self.date = date
-		self.filter = filter_
 		self.path = path
 
-		#print(json.dumps(self.data,indent=4))
-
-
 	def write(self):
-		for file in self.filter:
-			with open(self.path + file + ".csv", mode='w') as csv_file:
-				writer = csv.DictWriter(csv_file, fieldnames=self.fields, delimiter=";", quoting=csv.QUOTE_ALL)
+		for contract, rows in self.data.items():
+			fields = list(rows.keys())
+			temp = []
+			with open(self.path + contract + ".csv", "w") as csv_file:
+				writer = csv.DictWriter(csv_file, fieldnames=fields, delimiter=";", quoting=csv.QUOTE_ALL)
 				writer.writeheader()
-				for k,v in self.data[file].items():
-					participant = k
-					longcontracts = re.sub(r",", ".", v[0])
-					long = v[1]
-					shortcontracts = re.sub(r",", ".", v[2])
-					short = v[3]
+				for row in rows.values():
+					temp.append(row)
+				data = list(zip(*temp))
+				for value in data:
 					writer.writerow({
-						'IDENTIFICADOR': re.sub(r"/", "", self.date["dData1"]) + "_" + file + "_" + participant,
-						'DATA': self.date["dData1"] ,
-						'DERIVATIVO': file,
-						'PARTICIPANTE': participant,
-						'LONGCONTRACTS': v[0],
-						'LONG%': long,
-						'SHORTCONTRACTS': v[2],
-						'SHORT%': short,
-						'SALDO': str(round(eval(longcontracts + "-" + shortcontracts), 2))
+						fields[0]: value[0],
+						fields[1]: value[1],
+						fields[2]: value[2],
+						fields[3]: value[3],
+						fields[4]: value[4],
+						fields[5]: value[5],
+						fields[6]: value[6],
+						fields[7]: value[7],
+						fields[8]: value[8]
 					})
