@@ -17,9 +17,9 @@ class BMF:
 
 	def get_filters(self, path):
 		with open(path) as file:
-			self.filters = [re.sub(r"\n", "", filter_) for filter_ in file.readlines()]
+			return [re.sub(r"\n", "", filter_) for filter_ in file.readlines()]
 
-	def get_data(self):
+	def get_data_from_web(self):
 		print("Requisitando dados...")
 		while True:
 			try:
@@ -47,6 +47,13 @@ class BMF:
 				self.data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i+2].text))
 				self.data[contract][participant].append(re.sub(r"\s{2,}", "", tds[i+3].text))
 				contract = contracts.pop(0)
-				i += 4 #salta o i para a proxima tabela
+				i += 4
 				continue
-			i += 1		
+			i += 1
+	
+	def get_filtered_data(self, filters):
+		filtered_data = {}
+		for contract in filters:
+			if contract in self.data:
+				filtered_data[contract] = self.data[contract].copy()
+		return filtered_data
