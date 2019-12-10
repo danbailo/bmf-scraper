@@ -40,10 +40,11 @@ if __name__ == "__main__":
 			start_date = date(year_initial, month_initial, day_initial)
 			end_date = date(year_final, month_final, day_final)
 
+			
 			temp_dict = {}
 			keys = ['IDENTIFICADOR', 'DATA', 'DERIVATIVO', 'PARTICIPANTE', 'LONGCONTRACTS', 'LONG_', 'SHORTCONTRACTS', 'SHORT_', 'SALDO']
 
-			for single_date in daterange(start_date, end_date):
+			for single_date in daterange(start_date, end_date):				
 				day = str(single_date.day)
 				month = str(single_date.month)
 				year = str(single_date.year)
@@ -55,29 +56,43 @@ if __name__ == "__main__":
 
 				print("Requisitando dados do data:",day+"/"+month+"/"+year)
 
-				bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', {'dData1': month+"/"+day+"/"+year})
+				format_date = (month, day, year)
+
+				bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', format_date)
 				
 				path = "../filters/contract.txt"
 				filters = bmf.get_filters(path)
 				bmf.get_data_from_web()
 
 				prepared_data = bmf.get_prepared_data(filters)
-				if not prepared_data: continue
+				if not prepared_data: 
+					continue
+				
+				state = 0
+				if not temp_dict: 
+					temp_dict = prepared_data.copy()
+					state = 1
 
-				if not temp_dict: temp_dict = prepared_data.copy()
-
+				print(json.dumps(prepared_data, indent=4))
+				
 				for f in filters:
-					for key in keys:				
+					for key in keys:
+						if state == 1: continue		
 						temp_dict[f][key] += prepared_data[f][key]
 
-			csv.write(temp_dict)
-			database = Database(
-				user="root",
-				password="59228922ddd",
-				database="BMF_values"
-			)
-			database.insert_data(temp_dict)
-			database.close()
+				print(json.dumps(temp_dict, indent=4))
+
+#			print(json.dumps(temp_dict, indent=4))
+			#csv.write(temp_dict)
+			exit()
+			csv.write2(temp_dict)
+			#database = Database(
+			#	user="root",
+			#	password="59228922ddd",
+			#	database="BMF_values"
+			#)
+			#database.insert_data(temp_dict)
+			#database.close()
 		elif option == 2:
 			csv.get_accumulated()
 		elif option == 3: exit(0)
