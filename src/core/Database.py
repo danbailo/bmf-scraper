@@ -21,7 +21,7 @@ class Database:
 		self.cursor.execute("CREATE DATABASE IF NOT EXISTS {database};".format(database=database))
 		self.cursor.execute("USE {database};".format(database=database))
 		self.cursor.execute(
-			"CREATE TABLE IF NOT EXISTS all_data ("
+			"CREATE TABLE IF NOT EXISTS DADOS ("
 			"  IDENTIFICADOR VARCHAR(64) NOT NULL,"
 			"  DATA DATE NOT NULL,"
 			"  DERIVATIVO VARCHAR(64) NOT NULL,"
@@ -33,8 +33,18 @@ class Database:
 			"  SALDO DECIMAL(30,20) NOT NULL,"
 			"  PRIMARY KEY(IDENTIFICADOR)"    
 			");")
+		self.cursor.execute(
+			"CREATE TABLE IF NOT EXISTS ACUMULADO ("
+			"  IDENTIFICADOR VARCHAR(64) NOT NULL,"
+			"  DATA DATE NOT NULL,"
+			"  DERIVATIVO VARCHAR(64) NOT NULL,"
+			"  PARTICIPANTE VARCHAR(64) NOT NULL,"
+			"  SALDO DECIMAL(30,20) NOT NULL,"
+			"  ACUMULADO DECIMAL(30,20) NOT NULL,"
+			"  PRIMARY KEY(IDENTIFICADOR)"    
+			");")			
 
-	def insert_into_all_data(self, all_data):
+	def insert_data(self, all_data):
 		for _, rows in all_data.items():
 			temp = []
 			for row in rows.values():
@@ -44,11 +54,14 @@ class Database:
 				date = value[1].split("/")
 				day = int(date[0])
 				month = int(date[1])
+				if month > 12:
+					month = 12
 				year = int(date[2])
 				date_mysql = datetime.datetime(year, month, day)
-				self.cursor.execute("""INSERT IGNORE INTO all_data (IDENTIFICADOR, DATA, DERIVATIVO, PARTICIPANTE, LONGCONTRACTS, LONG_, SHORTCONTRACTS, SHORT_, SALDO)
-						VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-						(value[0], date_mysql, value[2], value[3], re.sub(r",", ".", value[4]), value[5], re.sub(r",", ".", value[6]), value[7], value[8]))
+				self.cursor.execute(
+					"""INSERT IGNORE INTO DADOS (IDENTIFICADOR, DATA, DERIVATIVO, PARTICIPANTE, LONGCONTRACTS, LONG_, SHORTCONTRACTS, SHORT_, SALDO)
+					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+					(value[0], date_mysql, value[2], value[3], value[4].replace(",", ""), value[5], value[6].replace(",", ""), value[7], value[8]))
 			self.conn.commit()
 		print("Dados inseridos com sucesso!")      
 		

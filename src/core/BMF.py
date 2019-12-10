@@ -66,9 +66,9 @@ class BMF:
 				participant = k
 				identifier = re.sub(r"/", "", self.date["dData1"]) + "_" + contract + "_" + participant
 				date = self.date["dData1"]
-				longcontracts = float(re.sub(r",", "", v[0]))
+				longcontracts = float(v[0].replace(",", ""))
 				long = float(v[1])
-				shortcontracts = float(re.sub(r",", "", v[2]))
+				shortcontracts = float(v[2].replace(",", ""))
 				short = float(v[3])
 				balance = longcontracts - shortcontracts
 				prepared_data[contract]['IDENTIFICADOR'].append(identifier)
@@ -81,15 +81,3 @@ class BMF:
 				prepared_data[contract]['SHORT_'].append(short)
 				prepared_data[contract]['SALDO'].append(balance)
 		return prepared_data
-
-if __name__ == "__main__":
-		day = "12"
-		month = "06"
-		year = "2019"
-
-		data = {
-			'dData1': '12/05/2019'
-		}
-		bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', data)
-		print(bmf.get_data_from_web())
-		print(json.dumps(bmf.data, indent=4))

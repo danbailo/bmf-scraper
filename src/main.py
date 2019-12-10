@@ -8,75 +8,77 @@ import json
 def daterange(start_date, end_date):
 	for n in range(int ((end_date - start_date).days)):
 		yield start_date + timedelta(n)
-
 if __name__ == "__main__":
-
-	print("Entre com o intervalo de busca - [INICIAL, FINAL)\n")
-	print("Data INICIAL - dia/mes/ano")
-
 	while True:
-		day_initial = int(input("Dia: "))
-		month_initial = int(input("Mes: "))
-		year_initial = int(input("Ano: "))
-		option = input("Gostaria de digitar a data novamente, sim ou nao?\n> ")
-		if option[0].lower() == 'n': break
+		print("\nEntre com a opcao desejada")
+		print("1) Coletar dados")
+		print("2) Gerar planilha dos valores acumulados")
+		print("3) Sair")
+		option = int(input("> "))
 
-	print("\nData FINAL - dia/mes/ano")
-	while True:
-		day_final = int(input("Dia: "))
-		month_final = int(input("Mes: "))
-		year_final = int(input("Ano: "))
-		option = input("Gostaria de digitar a data novamente, sim ou nao?\n> ")
-		if option[0].lower() == 'n': break
-	print()	
-	start_date = date(year_initial, month_initial, day_initial)
-	end_date = date(year_final, month_final, day_final)
+		csv = CSV()
 
-	temp_dict = {}
-	keys = ['IDENTIFICADOR', 'DATA', 'DERIVATIVO', 'PARTICIPANTE', 'LONGCONTRACTS', 'LONG_', 'SHORTCONTRACTS', 'SHORT_', 'SALDO']
+		if option == 1:
+			print("Entre com o intervalo de busca - [INICIAL, FINAL)\n")
+			print("Data INICIAL - dia/mes/ano")
 
-	for single_date in daterange(start_date, end_date):
-		day = str(single_date.day)
-		month = str(single_date.month)
-		year = str(single_date.year)
-		
-		if len(day) == 1:
-			day = "0" + day
-		if len(month) == 1:
-			month = "0" + month			
+			while True:
+				day_initial = int(input("Dia: "))
+				month_initial = int(input("Mes: "))
+				year_initial = int(input("Ano: "))
+				option = input("Gostaria de digitar a data novamente, sim ou nao?\n> ")
+				if option[0].lower() == 'n': break
 
-		print("Requisitando dados do data:",day+"/"+month+"/"+year)
+			print("\nData FINAL - dia/mes/ano")
+			while True:
+				day_final = int(input("Dia: "))
+				month_final = int(input("Mes: "))
+				year_final = int(input("Ano: "))
+				option = input("Gostaria de digitar a data novamente, sim ou nao?\n> ")
+				if option[0].lower() == 'n': break
+			print()	
+			start_date = date(year_initial, month_initial, day_initial)
+			end_date = date(year_final, month_final, day_final)
 
-		bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', {'dData1': month+"/"+day+"/"+year})
-		
-		path = "../filters/contract.txt"
-		filters = bmf.get_filters(path)
-		bmf.get_data_from_web()
+			temp_dict = {}
+			keys = ['IDENTIFICADOR', 'DATA', 'DERIVATIVO', 'PARTICIPANTE', 'LONGCONTRACTS', 'LONG_', 'SHORTCONTRACTS', 'SHORT_', 'SALDO']
 
-		prepared_data = bmf.get_prepared_data(filters)
-		if not prepared_data: continue
+			for single_date in daterange(start_date, end_date):
+				day = str(single_date.day)
+				month = str(single_date.month)
+				year = str(single_date.year)
+				
+				if len(day) == 1:
+					day = "0" + day
+				if len(month) == 1:
+					month = "0" + month			
 
-		if not temp_dict: temp_dict = prepared_data.copy()
+				print("Requisitando dados do data:",day+"/"+month+"/"+year)
 
-		for f in filters:
-			for key in keys:				
-				temp_dict[f][key] += prepared_data[f][key]
+				bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', {'dData1': month+"/"+day+"/"+year})
+				
+				path = "../filters/contract.txt"
+				filters = bmf.get_filters(path)
+				bmf.get_data_from_web()
 
-	csv = CSV(temp_dict)
-	csv.write()
+				prepared_data = bmf.get_prepared_data(filters)
+				if not prepared_data: continue
 
-#	Traceback (most recent call last):
-#  File "main.py", line 73, in <module>
-#    database.insert_into_all_data(temp_dict)
-#  File "/home/daniel/Workspace/bmf-scraper/src/core/Database.py", line 48, in insert_into_all_data
-#    date_mysql = datetime.datetime(year, month, day)
-#ValueError: month must be in 1..12
+				if not temp_dict: temp_dict = prepared_data.copy()
 
-	
-	database = Database(
-		user="root",
-		password="59228922ddd",
-		database="BMF_values"
-	)
-	database.insert_into_all_data(temp_dict)
-	database.close()
+				for f in filters:
+					for key in keys:				
+						temp_dict[f][key] += prepared_data[f][key]
+
+			csv.write(temp_dict)
+			database = Database(
+				user="root",
+				password="59228922ddd",
+				database="BMF_values"
+			)
+			database.insert_data(temp_dict)
+			database.close()
+		elif option == 2:
+			csv.get_accumulated()
+		elif option == 3: exit(0)
+		else: continue
