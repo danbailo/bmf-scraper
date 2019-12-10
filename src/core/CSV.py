@@ -3,7 +3,7 @@ import os
 import re
 
 class CSV:
-	def __init__(self, data, path = os.path.join("..","csv","")):
+	def __init__(self, data, path=os.path.join("..","csv","")):
 		self.data = data
 		self.path = path
 
@@ -11,7 +11,7 @@ class CSV:
 		for contract, rows in self.data.items():
 			fields = list(rows.keys())
 			temp = []
-			with open(self.path + contract + ".csv", "w") as csv_file:
+			with open(self.path + contract + ".csv", mode="w") as csv_file:
 				writer = csv.DictWriter(csv_file, fieldnames=fields, delimiter=";", quoting=csv.QUOTE_ALL)
 				writer.writeheader()
 				for row in rows.values():

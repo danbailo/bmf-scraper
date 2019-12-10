@@ -26,11 +26,11 @@ class Database:
 			"  DATA DATE NOT NULL,"
 			"  DERIVATIVO VARCHAR(64) NOT NULL,"
 			"  PARTICIPANTE VARCHAR(64) NOT NULL,"
-			"  LONGCONTRACTS DECIMAL(10,4) NOT NULL,"
+			"  LONGCONTRACTS DECIMAL(11,5) NOT NULL,"
 			"  LONG_ DECIMAL(5,2) NOT NULL,"
-			"  SHORTCONTRACTS DECIMAL(10,4) NOT NULL,"
+			"  SHORTCONTRACTS DECIMAL(11,5) NOT NULL,"
 			"  SHORT_ DECIMAL(5,2) NOT NULL,"
-			"  SALDO DECIMAL(10,4) NOT NULL,"
+			"  SALDO DECIMAL(30,20) NOT NULL,"
 			"  PRIMARY KEY(IDENTIFICADOR)"    
 			");")
 
@@ -52,6 +52,6 @@ class Database:
 			self.conn.commit()
 		print("Dados inseridos com sucesso!")      
 		
-	def __del__(self):
+	def close(self):
 		self.cursor.close()
 		self.conn.close()

@@ -10,6 +10,7 @@ class BMF:
 	def __init__(self, url, date):
 		self.url = url
 		self.date = date
+		self.data = False
 
 	def request(self):
 		response = requests.post(self.url, data=self.date, verify=False)
@@ -20,7 +21,7 @@ class BMF:
 			return [re.sub(r"\n", "", filter_) for filter_ in file.readlines()]
 
 	def get_data_from_web(self):
-		print("Requisitando dados...")
+		#print("Requisitando dados...")
 		while True:
 			try:
 				response = self.request()
@@ -28,10 +29,16 @@ class BMF:
 			except Exception:
 				continue
 		soup = BeautifulSoup(response.text, "html.parser")
+
+		if soup.find("div", attrs={"class": "alert-box secondary"}):
+			return False
+
 		contracts = [re.sub(r"\s{2,}", "", contract.text) for contract in soup.findAll("caption")]
 		tds = soup.findAll("td")
 
 		self.data = defaultdict(lambda: defaultdict(list))
+		if len(contracts) == 0: 
+			return False
 		contract = contracts.pop(0)
 		
 		i = 0
@@ -52,17 +59,18 @@ class BMF:
 			i += 1
 	
 	def get_prepared_data(self, filters):
+		if not self.data: return False
 		prepared_data = defaultdict(lambda: defaultdict(list))
 		for contract in filters:
 			for k,v in self.data[contract].items():
 				participant = k
 				identifier = re.sub(r"/", "", self.date["dData1"]) + "_" + contract + "_" + participant
 				date = self.date["dData1"]
-				longcontracts = re.sub(r",", ".", v[0])
-				long = v[1]
-				shortcontracts = re.sub(r",", ".", v[2])
-				short = v[3]
-				balance = str(eval(longcontracts + "-" + shortcontracts))
+				longcontracts = float(re.sub(r",", "", v[0]))
+				long = float(v[1])
+				shortcontracts = float(re.sub(r",", "", v[2]))
+				short = float(v[3])
+				balance = longcontracts - shortcontracts
 				prepared_data[contract]['IDENTIFICADOR'].append(identifier)
 				prepared_data[contract]['DATA'].append(date)
 				prepared_data[contract]['DERIVATIVO'].append(contract)
@@ -73,3 +81,15 @@ class BMF:
 				prepared_data[contract]['SHORT_'].append(short)
 				prepared_data[contract]['SALDO'].append(balance)
 		return prepared_data
+
+if __name__ == "__main__":
+		day = "12"
+		month = "06"
+		year = "2019"
+
+		data = {
+			'dData1': '12/05/2019'
+		}
+		bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', data)
+		print(bmf.get_data_from_web())
+		print(json.dumps(bmf.data, indent=4))
