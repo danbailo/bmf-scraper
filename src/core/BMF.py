@@ -19,7 +19,7 @@ class BMF:
 		response = requests.post(self.url, data=self.__date, verify=False)
 		return response
 
-	def get_filters(self, path):
+	def get_filters(self, path=os.path.join("..", "inputs", "derivatives.txt")):
 		with open(path) as file:
 			return [re.sub(r"\n", "", filter_) for filter_ in file.readlines()]
 
