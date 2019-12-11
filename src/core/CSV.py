@@ -13,7 +13,7 @@ class CSV:
 			fields = list(rows.keys())
 			temp = []
 			try:
-				with open(path + contract.upper() + ".csv", mode="w") as csv_file:
+				with open(path + contract.upper() + ".csv", mode="w", newline='\n', encoding='utf-8') as csv_file:
 					writer = csv.DictWriter(csv_file, fieldnames=fields, delimiter=";")
 					writer.writeheader()
 					for row in rows.values():
@@ -43,7 +43,7 @@ class CSV:
 			accumulated = defaultdict(int)
 			temp = []
 			try:
-				with open(path + contract.upper() + " ACCUMULATED.csv", mode="w") as csv_file:
+				with open(path + contract.upper() + " ACCUMULATED.csv", mode="w", newline='\n', encoding='utf-8') as csv_file:
 					writer = csv.DictWriter(csv_file, fieldnames=fields, delimiter=";")
 					writer.writeheader()
 					for row in rows.values():
