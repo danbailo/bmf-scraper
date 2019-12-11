@@ -1,6 +1,7 @@
 from core import BMF, CSV, Database
 from datetime import timedelta, date
 from tqdm import trange
+from sys import platform
 import datetime
 import os
 
@@ -17,13 +18,23 @@ def get_path(accumulated=False):
 	print("\nDigite o caminho de onde os arquivos serão gravados: ")
 	print("Obs: Caso o caminho seja escrito incorretamente, os arquivos serão gravados no diretório padrão.")
 	if not accumulated:
-		print(r"Diretório padrão - .\bmf-scraper\csv")
-	else:
-		print(r"Diretório padrão - .\bmf-scraper\csv\ACCUMULATED")
+		if platform == "linux" or platform == "linux2":
+			print(r"Diretório padrão - ./bmf-scraper/csv")
+		elif platform == "win32":			
+			print(r"Diretório padrão - .\bmf-scraper\csv")
+	else:		
+		if platform == "linux" or platform == "linux2":
+			print(r"Diretório padrão - ./bmf-scraper/csv/ACCUMULATED")
+		elif platform == "win32":			
+			print(r"Diretório padrão - .\bmf-scraper\csv\ACCUMULATED")		
 	path = input("> ")
 	if path:
-		if path[-1] != "\\":
-			path = path + "\\"
+		if platform == "linux":
+			if path[-1] != "/":
+				path = path + "/"			
+		elif platform == "win32":
+			if path[-1] != "\\":
+				path = path + "\\"
 	return path
 
 if __name__ == "__main__":
@@ -48,7 +59,7 @@ if __name__ == "__main__":
 			if not os.path.isdir(path_accumulated):
 				path_accumulated = os.path.join("..","csv","accumulated","")
 
-			print("Entre com o intervalo de busca - [INICIAL, FINAL)\n")
+			print("\nEntre com o intervalo de busca - [INICIAL, FINAL)\n")
 
 			while True:
 				print("Data INICIAL - dia/mês/ano")

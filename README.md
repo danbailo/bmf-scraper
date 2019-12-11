@@ -56,6 +56,10 @@ Para executar o programa, abra um PowerShell/prompt de comando no diretório cor
 * `cd src` - Entra no diretório que está o programa principal.
 * `python main.py` - **Executa o programa**
 
+ou
+
+Simplesmente entre na pasta `src` e dê dois cliques para abrir o arquivo `main.py` que o mesmo irá abrir automaticamente.
+
 Feito isso, basta seguir as opções do menu.
 
 ### Observações
