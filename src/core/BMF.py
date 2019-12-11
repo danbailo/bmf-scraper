@@ -7,13 +7,16 @@ from collections import defaultdict
 import json
 
 class BMF:
-	def __init__(self, url, date):
+	def __init__(self, url, format_date):
 		self.url = url
-		self.date = date
+		self.month = format_date[0]
+		self.day = format_date[1]
+		self.year = format_date[2]
+		self.__date = {'dData1': self.month+"/"+self.day+"/"+self.year}
 		self.data = False
 
 	def request(self):
-		response = requests.post(self.url, data=self.date, verify=False)
+		response = requests.post(self.url, data=self.__date, verify=False)
 		return response
 
 	def get_filters(self, path):
@@ -57,27 +60,28 @@ class BMF:
 				i += 4
 				continue
 			i += 1
-	
+
 	def get_prepared_data(self, filters):
 		if not self.data: return False
 		prepared_data = defaultdict(lambda: defaultdict(list))
 		for contract in filters:
-			for k,v in self.data[contract].items():
+			for k,v in self.data[contract].items():				
 				participant = k
-				identifier = re.sub(r"/", "", self.date["dData1"]) + "_" + contract + "_" + participant
-				date = self.date["dData1"]
+				identifier = self.day + self.month + self.year + "_" + contract + "_" + participant
+				date = self.day + "/" + self.month + "/" + self.year
 				longcontracts = float(v[0].replace(",", ""))
 				long = float(v[1])
 				shortcontracts = float(v[2].replace(",", ""))
-				short = float(v[3])
+				short = float(v[3])				
 				balance = longcontracts - shortcontracts
+
 				prepared_data[contract]['IDENTIFICADOR'].append(identifier)
 				prepared_data[contract]['DATA'].append(date)
 				prepared_data[contract]['DERIVATIVO'].append(contract)
 				prepared_data[contract]['PARTICIPANTE'].append(participant)
-				prepared_data[contract]['LONGCONTRACTS'].append(v[0])
+				prepared_data[contract]['LONGCONTRACTS'].append(longcontracts)
 				prepared_data[contract]['LONG_'].append(long)
-				prepared_data[contract]['SHORTCONTRACTS'].append(v[2])
+				prepared_data[contract]['SHORTCONTRACTS'].append(shortcontracts)
 				prepared_data[contract]['SHORT_'].append(short)
 				prepared_data[contract]['SALDO'].append(balance)
 		return prepared_data
