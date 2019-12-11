@@ -1,23 +1,54 @@
 from collections import defaultdict
 import mysql.connector
 import datetime
+import os
+import re
 
 class Database:
-	def __init__(self, user=None, password=None, database=None, host="127.0.0.1", port="3306"):
-		if user in [None, ""]:
-			print("Por favor, entre com usuario e senha!")
+	def __init__(self):
+		pass
+	
+	def get_config(self, path=os.path.join("..", "inputs", "db_config.txt")):
+		config = []
+		with open(path) as file:
+			for line in file:
+				try:
+					config.append(re.match(r".*: (.*)", line)[1])
+				except TypeError:
+					config.append("")
+		return config
+
+	def connect(self, config):
+		user = config[0]
+		password = config[1]
+		database = config[2]
+		host = config[3]
+		port = config[4]
+
+		if user == "":
+			print("Por favor, insira o usuário do banco de dados no arquivo de configuração!")
 			exit(-1)
-		if password in [None]:
-			print("Por favor, entre com usuario e senha!")
-			exit(-1)
-		if database in [None, ""]:
-			database = "bmf"
-		if host in [None, ""]:
+
+		if database == "":
+			print("Por favor, insira o nome do banco de dados no arquivo de configuração!")
+			exit(-1)			
+
+		if host == "":
 			host = "127.0.0.1"
-		if port in [None, ""]:
+
+		if port == "":
 			port = "3306"
 
 		try:
+			self.conn = mysql.connector.connect(
+				user=user,
+				passwd=password,
+				database=database,
+				host=host,
+				port=port
+			)
+			self.cursor = self.conn.cursor()
+		except mysql.connector.errors.ProgrammingError:
 			self.conn = mysql.connector.connect(
 				user=user,
 				passwd=password,
@@ -25,16 +56,19 @@ class Database:
 				port=port
 			)
 			self.cursor = self.conn.cursor()
-			self.cursor.execute("CREATE DATABASE IF NOT EXISTS {database};".format(database=database))
-			self.cursor.execute("USE {database};".format(database=database))
-		except Exception:
-			print("\nERRO tentar se conectar ao banco de dados!")
-			print("Por favor, instale o banco de dados que foi disponibilizado no arquivo README.md ou verifique os dados e tente novamente!")
-			exit(-1)
+			try:
+				self.cursor.execute("CREATE DATABASE IF NOT EXISTS {database};".format(database=database))	
+				self.cursor.execute("USE {database};".format(database=database))
+			except Exception:
+				print("\nERRO tentar se conectar ao banco de dados!")
+				print("Por favor, instale o banco de dados que foi disponibilizado no arquivo README.md ou verifique os dados e tente novamente!")
+				exit(-1)			
 
 		print("\nConectado ao banco de dados com sucesso!")
+
+	def create_tables(self):
 		self.cursor.execute(
-			"CREATE TABLE IF NOT EXISTS dados ("
+			"CREATE TABLE IF NOT EXISTS derivatives_contratos ("
 			"	IDENTIFICADOR VARCHAR(64) NOT NULL,"
 			"	DATA DATE NOT NULL,"
 			"	DERIVATIVO VARCHAR(64) NOT NULL,"
@@ -47,7 +81,7 @@ class Database:
 			"	PRIMARY KEY(IDENTIFICADOR)"    
 			");")
 		self.cursor.execute(
-			"CREATE TABLE IF NOT EXISTS acumulado ("
+			"CREATE TABLE IF NOT EXISTS derivatives_acumulado ("
 			"	IDENTIFICADOR_ID VARCHAR(64) NOT NULL,"
 			"	DATA DATE NOT NULL,"
 			"	PARTICIPANTE VARCHAR(64) NOT NULL,"
@@ -55,10 +89,10 @@ class Database:
 			"	ACUMULADO BIGINT NOT NULL,"
 			"	PRIMARY KEY(IDENTIFICADOR_ID),"
 			"	FOREIGN KEY(IDENTIFICADOR_ID)"
-			"	REFERENCES dados(IDENTIFICADOR)"			    
-			");")			
+			"	REFERENCES derivatives_contratos(IDENTIFICADOR)"			    
+			");")
 
-	def insert_dados(self, all_data):
+	def insert_derivatives_contratos(self, all_data):
 		for _, rows in all_data.items():
 			temp = []
 			for row in rows.values():
@@ -73,13 +107,13 @@ class Database:
 				year = int(date[2])
 				date_mysql = datetime.datetime(year, month, day)
 				self.cursor.execute(
-					"""INSERT IGNORE INTO dados (IDENTIFICADOR, DATA, DERIVATIVO, PARTICIPANTE, LONGCONTRACTS, LONG_, SHORTCONTRACTS, SHORT_, SALDO)
+					"""INSERT IGNORE INTO derivatives_contratos (IDENTIFICADOR, DATA, DERIVATIVO, PARTICIPANTE, LONGCONTRACTS, LONG_, SHORTCONTRACTS, SHORT_, SALDO)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
 					(value[0], date_mysql, value[2], value[3], value[4], value[5], value[6], value[7], value[8]))
 			self.conn.commit()
 		print('\nDados inseridos com sucesso na tabela "dados"!') 
 		
-	def insert_acumulado(self, all_data):
+	def insert_derivatives_acumulado(self, all_data):
 		for _, rows in all_data.items():
 			accumulated = defaultdict(int)
 			temp = []
@@ -96,17 +130,17 @@ class Database:
 				date_mysql = datetime.datetime(year, month, day)				
 				accumulated[value[3]] += value[8]
 				self.cursor.execute(
-					"""INSERT IGNORE INTO acumulado (IDENTIFICADOR_ID, DATA, PARTICIPANTE, SALDO, ACUMULADO)
+					"""INSERT IGNORE INTO derivatives_acumulado (IDENTIFICADOR_ID, DATA, PARTICIPANTE, SALDO, ACUMULADO)
 					VALUES (%s, %s, %s, %s, %s)""",
 					(value[0], date_mysql, value[3], value[8], accumulated[value[3]]))
 			self.conn.commit()
-		print('Dados inseridos com sucesso na tabela "acumulado"!') 
+		print('Dados inseridos com sucesso na tabela "derivatives_acumulado"!') 
 
 	def truncate_tables(self):
-		self.cursor.execute("DROP TABLE IF EXISTS acumulado")
-		self.cursor.execute("DROP TABLE IF EXISTS dados")
+		self.cursor.execute("DROP TABLE IF EXISTS derivatives_acumulado")
+		self.cursor.execute("DROP TABLE IF EXISTS derivatives_contratos")
 		self.cursor.execute(
-			"CREATE TABLE dados ("
+			"CREATE TABLE derivatives_contratos ("
 			"	IDENTIFICADOR VARCHAR(64) NOT NULL,"
 			"	DATA DATE NOT NULL,"
 			"	DERIVATIVO VARCHAR(64) NOT NULL,"
@@ -119,7 +153,7 @@ class Database:
 			"	PRIMARY KEY(IDENTIFICADOR)"    
 			");")
 		self.cursor.execute(
-			"CREATE TABLE acumulado ("
+			"CREATE TABLE derivatives_acumulado ("
 			"	IDENTIFICADOR_ID VARCHAR(64) NOT NULL,"
 			"	DATA DATE NOT NULL,"
 			"	PARTICIPANTE VARCHAR(64) NOT NULL,"
@@ -127,7 +161,7 @@ class Database:
 			"	ACUMULADO BIGINT NOT NULL,"
 			"	PRIMARY KEY(IDENTIFICADOR_ID),"
 			"	FOREIGN KEY(IDENTIFICADOR_ID)"
-			"	REFERENCES dados(IDENTIFICADOR)"			    
+			"	REFERENCES derivatives_contratos(IDENTIFICADOR)"			    
 			");")
 		print("Tabelas truncadas com sucesso!") 
 
