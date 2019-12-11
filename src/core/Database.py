@@ -7,7 +7,7 @@ class Database:
 		if user in [None, ""]:
 			print("Por favor, entre com usuario e senha!")
 			exit(-1)
-		if password in [None, ""]:
+		if password in [None]:
 			print("Por favor, entre com usuario e senha!")
 			exit(-1)
 		if database in [None, ""]:
@@ -17,16 +17,22 @@ class Database:
 		if port in [None, ""]:
 			port = "3306"
 
-		self.conn = mysql.connector.connect(
-			user=user,
-			passwd=password,
-			host=host,
-			port=port
-		)
+		try:
+			self.conn = mysql.connector.connect(
+				user=user,
+				passwd=password,
+				host=host,
+				port=port
+			)
+			self.cursor = self.conn.cursor()
+			self.cursor.execute("CREATE DATABASE IF NOT EXISTS {database};".format(database=database))
+			self.cursor.execute("USE {database};".format(database=database))
+		except Exception:
+			print("\nERRO tentar se conectar ao banco de dados!")
+			print("Por favor, instale o banco de dados que foi disponibilizado no arquivo README.md ou verifique os dados e tente novamente!")
+			exit(-1)
+
 		print("\nConectado ao banco de dados com sucesso!")
-		self.cursor = self.conn.cursor()
-		self.cursor.execute("CREATE DATABASE IF NOT EXISTS {database};".format(database=database))
-		self.cursor.execute("USE {database};".format(database=database))
 		self.cursor.execute(
 			"CREATE TABLE IF NOT EXISTS dados ("
 			"	IDENTIFICADOR VARCHAR(64) NOT NULL,"

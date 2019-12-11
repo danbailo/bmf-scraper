@@ -1,0 +1,193 @@
+DATA;PARTICIPANTE;SALDO;ACUMULADO
+04/01/2010;Financial Institutions;844;844
+04/01/2010;Banks;15;15
+04/01/2010;Brokers & Dealers;829;829
+04/01/2010;Institutional Investors;35;35
+04/01/2010;Domestic;35;35
+04/01/2010;Nonresident Investors;1993;1993
+04/01/2010;Nonresident investors - RES.2689;1993;1993
+04/01/2010;Corporations;-897;-897
+04/01/2010;Individuals;-1975;-1975
+04/01/2010;Total;0;0
+05/01/2010;Financial Institutions;874;1718
+05/01/2010;Banks;5;20
+05/01/2010;Brokers & Dealers;869;1698
+05/01/2010;Institutional Investors;446;481
+05/01/2010;Domestic;446;481
+05/01/2010;Nonresident Investors;1260;3253
+05/01/2010;Nonresident investors - RES.2689;1260;3253
+05/01/2010;Corporations;-661;-1558
+05/01/2010;Individuals;-1919;-3894
+05/01/2010;Total;0;0
+06/01/2010;Financial Institutions;904;2622
+06/01/2010;Brokers & Dealers;904;2602
+06/01/2010;Institutional Investors;1171;1652
+06/01/2010;Domestic;1171;1652
+06/01/2010;Nonresident Investors;659;3912
+06/01/2010;Nonresident investors - RES.2689;659;3912
+06/01/2010;Corporations;-837;-2395
+06/01/2010;Individuals;-1897;-5791
+06/01/2010;Total;0;0
+07/01/2010;Financial Institutions;814;3436
+07/01/2010;Banks;15;35
+07/01/2010;Brokers & Dealers;799;3401
+07/01/2010;Institutional Investors;1234;2886
+07/01/2010;Domestic;1234;2886
+07/01/2010;Nonresident Investors;344;4256
+07/01/2010;Nonresident investors - RES.2689;344;4256
+07/01/2010;Corporations;-711;-3106
+07/01/2010;Individuals;-1681;-7472
+07/01/2010;Total;0;0
+08/01/2010;Financial Institutions;854;4290
+08/01/2010;Banks;25;60
+08/01/2010;Brokers & Dealers;829;4230
+08/01/2010;Institutional Investors;-623;2263
+08/01/2010;Domestic;-623;2263
+08/01/2010;Nonresident Investors;1819;6075
+08/01/2010;Nonresident investors - RES.2689;1819;6075
+08/01/2010;Corporations;-696;-3802
+08/01/2010;Individuals;-1354;-8826
+08/01/2010;Total;0;0
+11/01/2010;Financial Institutions;919;5209
+11/01/2010;Banks;40;100
+11/01/2010;Brokers & Dealers;879;5109
+11/01/2010;Institutional Investors;-965;1298
+11/01/2010;Domestic;-965;1298
+11/01/2010;Nonresident Investors;903;6978
+11/01/2010;Nonresident investors - RES.2689;903;6978
+11/01/2010;Corporations;-368;-4170
+11/01/2010;Individuals;-489;-9315
+11/01/2010;Total;0;0
+12/01/2010;Financial Institutions;856;6065
+12/01/2010;Banks;-35;65
+12/01/2010;Brokers & Dealers;891;6000
+12/01/2010;Institutional Investors;-894;404
+12/01/2010;Domestic;-894;404
+12/01/2010;Nonresident Investors;1151;8129
+12/01/2010;Nonresident investors - RES.2689;1151;8129
+12/01/2010;Corporations;-632;-4802
+12/01/2010;Individuals;-481;-9796
+12/01/2010;Total;0;0
+13/01/2010;Financial Institutions;866;6931
+13/01/2010;Banks;-15;50
+13/01/2010;Brokers & Dealers;881;6881
+13/01/2010;Institutional Investors;-753;-349
+13/01/2010;Domestic;-753;-349
+13/01/2010;Nonresident Investors;981;9110
+13/01/2010;Nonresident investors - RES.2689;981;9110
+13/01/2010;Corporations;-680;-5482
+13/01/2010;Individuals;-414;-10210
+13/01/2010;Total;0;0
+14/01/2010;Financial Institutions;807;7738
+14/01/2010;Banks;-75;-25
+14/01/2010;Brokers & Dealers;882;7763
+14/01/2010;Institutional Investors;-1880;-2229
+14/01/2010;Domestic;-1880;-2229
+14/01/2010;Nonresident Investors;931;10041
+14/01/2010;Nonresident investors - RES.2689;931;10041
+14/01/2010;Corporations;-100;-5582
+14/01/2010;Individuals;242;-9968
+14/01/2010;Total;0;0
+15/01/2010;Financial Institutions;786;8524
+15/01/2010;Banks;-140;-165
+15/01/2010;Brokers & Dealers;930;8693
+15/01/2010;Other;-4;-4
+15/01/2010;Institutional Investors;-2399;-4628
+15/01/2010;Domestic;-2399;-4628
+15/01/2010;Nonresident Investors;351;10392
+15/01/2010;Nonresident investors - RES.2689;351;10392
+15/01/2010;Corporations;168;-5414
+15/01/2010;Individuals;1094;-8874
+15/01/2010;Total;0;0
+18/01/2010;Financial Institutions;865;9389
+18/01/2010;Banks;-95;-260
+18/01/2010;Brokers & Dealers;960;9653
+18/01/2010;Institutional Investors;-1251;-5879
+18/01/2010;Domestic;-1251;-5879
+18/01/2010;Nonresident Investors;307;10699
+18/01/2010;Nonresident investors - RES.2689;307;10699
+18/01/2010;Corporations;-71;-5485
+18/01/2010;Individuals;150;-8724
+18/01/2010;Total;0;0
+19/01/2010;Financial Institutions;774;10163
+19/01/2010;Banks;-70;-330
+19/01/2010;Brokers & Dealers;844;10497
+19/01/2010;Institutional Investors;-1909;-7788
+19/01/2010;Domestic;-1909;-7788
+19/01/2010;Nonresident Investors;3129;13828
+19/01/2010;Nonresident investors - RES.2689;3129;13828
+19/01/2010;Corporations;-613;-6098
+19/01/2010;Individuals;-1381;-10105
+19/01/2010;Total;0;0
+20/01/2010;Financial Institutions;739;10902
+20/01/2010;Banks;-70;-400
+20/01/2010;Brokers & Dealers;809;11306
+20/01/2010;Institutional Investors;-4780;-12568
+20/01/2010;Domestic;-4780;-12568
+20/01/2010;Nonresident Investors;2468;16296
+20/01/2010;Nonresident investors - RES.2689;2468;16296
+20/01/2010;Corporations;649;-5449
+20/01/2010;Individuals;924;-9181
+20/01/2010;Total;0;0
+21/01/2010;Financial Institutions;805;11707
+21/01/2010;Banks;-25;-425
+21/01/2010;Brokers & Dealers;845;12151
+21/01/2010;Other;-15;-19
+21/01/2010;Institutional Investors;-7148;-19716
+21/01/2010;Domestic;-7148;-19716
+21/01/2010;Nonresident Investors;3045;19341
+21/01/2010;Nonresident investors - RES.2689;3045;19341
+21/01/2010;Corporations;1041;-4408
+21/01/2010;Individuals;2257;-6924
+21/01/2010;Total;0;0
+22/01/2010;Financial Institutions;711;12418
+22/01/2010;Banks;-155;-580
+22/01/2010;Brokers & Dealers;866;13017
+22/01/2010;Institutional Investors;-7179;-26895
+22/01/2010;Domestic;-7179;-26895
+22/01/2010;Nonresident Investors;3799;23140
+22/01/2010;Nonresident investors - RES.2689;3799;23140
+22/01/2010;Corporations;1067;-3341
+22/01/2010;Individuals;1602;-5322
+22/01/2010;Total;0;0
+26/01/2010;Financial Institutions;701;13119
+26/01/2010;Banks;-230;-810
+26/01/2010;Brokers & Dealers;931;13948
+26/01/2010;Institutional Investors;-7908;-34803
+26/01/2010;Domestic;-7908;-34803
+26/01/2010;Nonresident Investors;3938;27078
+26/01/2010;Nonresident investors - RES.2689;3938;27078
+26/01/2010;Corporations;1136;-2205
+26/01/2010;Individuals;2133;-3189
+26/01/2010;Total;0;0
+27/01/2010;Financial Institutions;638;13757
+27/01/2010;Banks;-280;-1090
+27/01/2010;Brokers & Dealers;926;14874
+27/01/2010;Other;-8;-27
+27/01/2010;Institutional Investors;-8777;-43580
+27/01/2010;Domestic;-8777;-43580
+27/01/2010;Nonresident Investors;3845;30923
+27/01/2010;Nonresident investors - RES.2689;3845;30923
+27/01/2010;Corporations;1129;-1076
+27/01/2010;Individuals;3165;-24
+27/01/2010;Total;0;0
+28/01/2010;Financial Institutions;641;14398
+28/01/2010;Banks;-275;-1365
+28/01/2010;Brokers & Dealers;916;15790
+28/01/2010;Institutional Investors;-7154;-50734
+28/01/2010;Domestic;-7154;-50734
+28/01/2010;Nonresident Investors;4714;35637
+28/01/2010;Nonresident investors - RES.2689;4714;35637
+28/01/2010;Corporations;878;-198
+28/01/2010;Individuals;921;897
+28/01/2010;Total;0;0
+29/01/2010;Financial Institutions;521;14919
+29/01/2010;Banks;-340;-1705
+29/01/2010;Brokers & Dealers;861;16651
+29/01/2010;Institutional Investors;-8409;-59143
+29/01/2010;Domestic;-8409;-59143
+29/01/2010;Nonresident Investors;5134;40771
+29/01/2010;Nonresident investors - RES.2689;5134;40771
+29/01/2010;Corporations;1181;983
+29/01/2010;Individuals;1573;2470
+29/01/2010;Total;0;0

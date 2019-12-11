@@ -17,19 +17,24 @@ def get_path(accumulated=False):
 	print("\nDigite o caminho de onde os arquivos serão gravados: ")
 	print("Obs: Caso o caminho seja escrito incorretamente, os arquivos serão gravados no diretório padrão.")
 	if not accumulated:
-		print("Diretório padrão - ./bmf-scraper/csv/")
+		print(r"Diretório padrão - .\bmf-scraper\csv")
 	else:
-		print("Diretório padrão - ./bmf-scraper/csv/accumulated")
+		print(r"Diretório padrão - .\bmf-scraper\csv\ACCUMULATED")
 	path = input("> ")
+	if path[-1] != "\\":
+		path = path + "\\"
 	return path
 
 if __name__ == "__main__":
-	while True:
+	while True:		
 		print("\nEntre com a opção desejada:")
 		print("1) Coletar dados;")
 		print("2) Conectar no banco de dados;")
 		print("3) Sair")
-		option = int(input("> "))
+		try:
+			option = int(input("> "))
+		except Exception:
+			continue
 
 		csv = CSV()
 
@@ -46,21 +51,27 @@ if __name__ == "__main__":
 
 			while True:
 				print("Data INICIAL - dia/mês/ano")
-				day_initial = int(input("Dia: "))
-				month_initial = int(input("Mês: "))
-				year_initial = int(input("Ano: "))
-
-				option = get_option()
-				if option[0].lower() == 'n': break
+				try:
+					day_initial = int(input("Dia: "))
+					month_initial = int(input("Mês: "))
+					year_initial = int(input("Ano: "))
+					option = get_option()
+					if option[0].lower() == 'n': break					
+				except Exception:
+					print("Por favor, digite apenas valores inteiros!\n")
+					continue
 
 			while True:
 				print("\nData FINAL - dia/mês/ano")
-				day_final = int(input("Dia: "))
-				month_final = int(input("Mês: "))
-				year_final = int(input("Ano: "))
-				
-				option = get_option()
-				if option[0].lower() == 'n': break
+				try:
+					day_final = int(input("Dia: "))
+					month_final = int(input("Mês: "))
+					year_final = int(input("Ano: "))
+					option = get_option()
+					if option[0].lower() == 'n': break					
+				except Exception:
+					print("Por favor, digite apenas valores inteiros!\n")
+					continue					
 
 			print()
 
