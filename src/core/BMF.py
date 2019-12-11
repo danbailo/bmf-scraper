@@ -24,7 +24,6 @@ class BMF:
 			return [re.sub(r"\n", "", filter_) for filter_ in file.readlines()]
 
 	def get_data_from_web(self):
-		#print("Requisitando dados...")
 		while True:
 			try:
 				response = self.request()
@@ -69,9 +68,9 @@ class BMF:
 				participant = k
 				identifier = self.day + self.month + self.year + "_" + contract + "_" + participant
 				date = self.day + "/" + self.month + "/" + self.year
-				longcontracts = float(v[0].replace(",", ""))
+				longcontracts = int(v[0].replace(",", ""))
 				long = float(v[1])
-				shortcontracts = float(v[2].replace(",", ""))
+				shortcontracts = int(v[2].replace(",", ""))
 				short = float(v[3])				
 				balance = longcontracts - shortcontracts
 
