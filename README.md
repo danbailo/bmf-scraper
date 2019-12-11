@@ -62,6 +62,12 @@ Simplesmente entre na pasta `src` e dê dois cliques para abrir o arquivo `main.
 
 Feito isso, basta seguir as opções do menu.
 
+**Ao digitar a data, é muito importante que o ano, inicial e final, estejam no mesmo formato.**
+
+**Exemplo: 10 e 10 ou 2010 e 2010.**
+
+**Não coloque 10 e 2010 ou 2010 e 10!**
+
 ### Observações
 
 Após se conectar ao banco de dados, o mesmo solicitará o usuário, senha, nome do banco, IP e porta da conexão.
