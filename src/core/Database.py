@@ -21,30 +21,31 @@ class Database:
 		self.cursor.execute("CREATE DATABASE IF NOT EXISTS {database};".format(database=database))
 		self.cursor.execute("USE {database};".format(database=database))
 		self.cursor.execute(
-			"CREATE TABLE IF NOT EXISTS DADOS ("
-			"  IDENTIFICADOR VARCHAR(64) NOT NULL,"
-			"  DATA DATE NOT NULL,"
-			"  DERIVATIVO VARCHAR(64) NOT NULL,"
-			"  PARTICIPANTE VARCHAR(64) NOT NULL,"
-			"  LONGCONTRACTS DECIMAL(11,5) NOT NULL,"
-			"  LONG_ DECIMAL(5,2) NOT NULL,"
-			"  SHORTCONTRACTS DECIMAL(11,5) NOT NULL,"
-			"  SHORT_ DECIMAL(5,2) NOT NULL,"
-			"  SALDO DECIMAL(30,20) NOT NULL,"
-			"  PRIMARY KEY(IDENTIFICADOR)"    
+			"CREATE TABLE IF NOT EXISTS dados ("
+			"	IDENTIFICADOR VARCHAR(64) NOT NULL,"
+			"	DATA DATE NOT NULL,"
+			"	DERIVATIVO VARCHAR(64) NOT NULL,"
+			"	PARTICIPANTE VARCHAR(64) NOT NULL,"
+			"	LONGCONTRACTS INT NOT NULL,"
+			"	LONG_ DECIMAL(5,2) NOT NULL,"
+			"	SHORTCONTRACTS INT NOT NULL,"
+			"	SHORT_ DECIMAL(5,2) NOT NULL,"
+			"	SALDO INT NOT NULL,"
+			"	PRIMARY KEY(IDENTIFICADOR)"    
 			");")
 		self.cursor.execute(
-			"CREATE TABLE IF NOT EXISTS ACUMULADO ("
-			"  IDENTIFICADOR VARCHAR(64) NOT NULL,"
-			"  DATA DATE NOT NULL,"
-			"  DERIVATIVO VARCHAR(64) NOT NULL,"
-			"  PARTICIPANTE VARCHAR(64) NOT NULL,"
-			"  SALDO DECIMAL(30,20) NOT NULL,"
-			"  ACUMULADO DECIMAL(30,20) NOT NULL,"
-			"  PRIMARY KEY(IDENTIFICADOR)"    
+			"CREATE TABLE IF NOT EXISTS acumulado ("
+			"	IDENTIFICADOR_ID VARCHAR(64) NOT NULL,"
+			"	DATA DATE NOT NULL,"
+			"	PARTICIPANTE VARCHAR(64) NOT NULL,"
+			"	SALDO INT NOT NULL,"
+			"	ACUMULADO BIGINT NOT NULL,"
+			"	PRIMARY KEY(IDENTIFICADOR_ID),"
+			"	FOREIGN KEY(IDENTIFICADOR_ID)"
+			"	REFERENCES dados(IDENTIFICADOR)"			    
 			");")			
 
-	def insert_data(self, all_data):
+	def insert_dados(self, all_data):
 		for _, rows in all_data.items():
 			temp = []
 			for row in rows.values():
@@ -59,12 +60,33 @@ class Database:
 				year = int(date[2])
 				date_mysql = datetime.datetime(year, month, day)
 				self.cursor.execute(
-					"""INSERT IGNORE INTO DADOS (IDENTIFICADOR, DATA, DERIVATIVO, PARTICIPANTE, LONGCONTRACTS, LONG_, SHORTCONTRACTS, SHORT_, SALDO)
+					"""INSERT IGNORE INTO dados (IDENTIFICADOR, DATA, DERIVATIVO, PARTICIPANTE, LONGCONTRACTS, LONG_, SHORTCONTRACTS, SHORT_, SALDO)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-					(value[0], date_mysql, value[2], value[3], value[4].replace(",", ""), value[5], value[6].replace(",", ""), value[7], value[8]))
+					(value[0], date_mysql, value[2], value[3], value[4], value[5], value[6], value[7], value[8]))
 			self.conn.commit()
 		print("Dados inseridos com sucesso!")      
 		
+	def insert_acumulado(self, all_data):
+		for _, rows in all_data.items():
+			temp = []
+			for row in rows.values():
+				temp.append(row)
+			data = list(zip(*temp))
+			for value in data:
+				date = value[1].split("/")
+				day = int(date[0])
+				month = int(date[1])
+				if month > 12:
+					month = 12
+				year = int(date[2])
+				date_mysql = datetime.datetime(year, month, day)
+				self.cursor.execute(
+					"""INSERT IGNORE INTO acumulado (IDENTIFICADOR, DATA, PARTICIPANTE, SALDO, ACUMULADO)
+					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+					(value[0], date_mysql, value[2], value[3], value[4], value[5], value[6], value[7], value[8]))
+			self.conn.commit()
+		print("Dados inseridos com sucesso!")   
+
 	def close(self):
 		self.cursor.close()
 		self.conn.close()
