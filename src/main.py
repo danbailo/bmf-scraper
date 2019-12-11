@@ -21,8 +21,9 @@ def get_path(accumulated=False):
 	else:
 		print(r"Diretório padrão - .\bmf-scraper\csv\ACCUMULATED")
 	path = input("> ")
-	if path[-1] != "\\":
-		path = path + "\\"
+	if path:
+		if path[-1] != "\\":
+			path = path + "\\"
 	return path
 
 if __name__ == "__main__":
