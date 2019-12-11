@@ -64,10 +64,13 @@ if __name__ == "__main__":
 			while True:
 				print("Data INICIAL - dia/mês/ano")
 				try:
-					day_initial = int(input("Dia: "))
-					month_initial = int(input("Mês: "))
-					year_initial = int(input("Ano: "))
-					option = get_option()
+					# day_initial = int(input("Dia: "))
+					# month_initial = int(input("Mês: "))
+					# year_initial = int(input("Ano: "))
+
+					day_initial, month_initial, year_initial = input().split("/")						
+					option = input("\nA data inicial informada foi {date}, deseja alterar?\n> ".format(date=day_initial+"/"+month_initial+"/"+year_initial))
+					if option == "": option = "n"
 					if option[0].lower() == 'n': break					
 				except Exception:
 					print("Por favor, digite apenas valores inteiros!\n")
@@ -75,20 +78,27 @@ if __name__ == "__main__":
 
 			while True:
 				print("\nData FINAL - dia/mês/ano")
+				today = date.today()
 				try:
-					day_final = int(input("Dia: "))
-					month_final = int(input("Mês: "))
-					year_final = int(input("Ano: "))
-					option = get_option()
-					if option[0].lower() == 'n': break					
-				except Exception:
-					print("Por favor, digite apenas valores inteiros!\n")
-					continue					
+					day_final, month_final, year_final = input().split("/")
+					if(day_final) == "":
+						day_final = today.day
+					if(month_final) == "":
+						month_final = today.month
+					if(year_final) == "":
+						year_final = today.year						
+				except ValueError:
+					day_final = today.day
+					month_final = today.month
+					year_final = today.year									
+				option = input("\nA data final informada foi {date}, deseja alterar?\n> ".format(date=str(day_final)+"/"+str(month_final)+"/"+str(year_final)))
+				if option == "": option = "n"
+				if option[0].lower() == 'n': break									
 
 			print()
 
-			initial_date = date(year_initial, month_initial, day_initial)
-			final_date = date(year_final, month_final, day_final)	
+			initial_date = date(int(year_initial), int(month_initial), int(day_initial))
+			final_date = date(int(year_final), int(month_final), int(day_final))	
 			temp_dict = {}
 			keys = ['IDENTIFICADOR', 'DATA', 'DERIVATIVO', 'PARTICIPANTE', 'LONGCONTRACTS', 'LONG_', 'SHORTCONTRACTS', 'SHORT_', 'SALDO']
 
@@ -107,8 +117,7 @@ if __name__ == "__main__":
 
 				bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', format_date)
 				
-				filters_path = os.path.join("..", "filters", "contract.txt")
-				filters = bmf.get_filters(filters_path)
+				filters = bmf.get_filters()
 				bmf.get_data_from_web()
 
 				prepared_data = bmf.get_prepared_data(filters)
@@ -131,25 +140,13 @@ if __name__ == "__main__":
 			print("\nOs dados foram gravados com sucesso!")
 
 		elif option == 2:
-			while True:
-				user = input("\nDigite o usuário do banco de dados: ")
-				password = input("\nDigite a senha do usuário do banco de dados: ")
-				db_name = input("\nDigite o nome do banco de dados: ")
-				print("\nDigite o IP de onde está localizado o banco de dados(caso seja IP local, não digite nada, apenas dê um ENTER)")
-				host = input(">")
-				print("\nDigite a porta da conexão de onde está localizado o banco de dados(caso seja a porta padrão, não digite nada, apenas dê um ENTER)")
-				port = input(">")
 
-				option_bd1 = get_option()
-				if option_bd1[0].lower() == 'n': break
+			db = Database()
 
-			database = Database(
-				user=user,
-				password=password,
-				database=db_name,
-				host=host,
-				port=port
-			)
+			config = db.get_config()
+
+			db.connect(config)		
+			db.create_tables()
 
 			while True:
 				print("\nEntre com a opção desejada:")
@@ -163,14 +160,14 @@ if __name__ == "__main__":
 						print("Antes de inserir os dados no banco, esses devem ser coletados!")
 						print("Por favor, execute a opção de coletar os dados e tente novamente!")
 					else:	
-						database.insert_dados(temp_dict)
-						database.insert_acumulado(temp_dict)
+						db.insert_derivatives_contratos(temp_dict)
+						db.insert_derivatives_acumulado(temp_dict)
 				
 				elif option_bd == 2:
-					database.truncate_tables()
+					db.truncate_tables()
 
 				elif option_bd == 3: 
-					database.close()					
+					db.close()					
 					break
 
 		elif option == 3: exit(0)
