@@ -17,6 +17,7 @@ def get_option():
 def get_path(accumulated=False):
 	print("\nDigite o caminho de onde os arquivos serão gravados: ")
 	print("Obs: Caso o caminho seja escrito incorretamente, os arquivos serão gravados no diretório padrão.")
+	print("Pressione Enter para manter o diretório padrão.")
 	if not accumulated:
 		if platform == "linux" or platform == "linux2":
 			print(r"Diretório padrão - ./bmf-scraper/csv")
@@ -38,6 +39,7 @@ def get_path(accumulated=False):
 	return path
 
 if __name__ == "__main__":
+
 	while True:		
 		print("\nEntre com a opção desejada:")
 		print("1) Coletar dados;")
@@ -64,34 +66,43 @@ if __name__ == "__main__":
 			while True:
 				print("Data INICIAL - dia/mês/ano")
 				try:
-					# day_initial = int(input("Dia: "))
-					# month_initial = int(input("Mês: "))
-					# year_initial = int(input("Ano: "))
-
-					day_initial, month_initial, year_initial = input().split("/")						
-					option = input("\nA data inicial informada foi {date}, deseja alterar?\n> ".format(date=day_initial+"/"+month_initial+"/"+year_initial))
+					day_initial, month_initial, year_initial = input().split("/")
+					if len(year_initial) != 4:
+						print("\nPor favor, insira o ano no formato XXXX!")
+						continue
+					option = input("\nA data inicial informada foi {date}. Deseja alterar, [s]im ou [n]ão/Enter?\n> ".format(date=day_initial+"/"+month_initial+"/"+year_initial))
+					date_initial = datetime.datetime(int(year_initial), int(month_initial),int(day_initial))
 					if option == "": option = "n"
 					if option[0].lower() == 'n': break					
 				except Exception:
-					print("Por favor, digite apenas valores inteiros!\n")
+					print("Por favor, entre com valores válidos!\n")
 					continue
-
 			while True:
 				print("\nData FINAL - dia/mês/ano")
 				today = date.today()
 				try:
 					day_final, month_final, year_final = input().split("/")
+					date_final = datetime.datetime(int(year_final), int(month_final), int(day_final))
+					if len(year_final) != 4 and year_final != "":
+						print("\nPor favor, insira o ano no formato XXXX!")
+						continue					
 					if(day_final) == "":
 						day_final = today.day
 					if(month_final) == "":
 						month_final = today.month
 					if(year_final) == "":
-						year_final = today.year						
-				except ValueError:
+						year_final = today.year
+
+				except ValueError:					
 					day_final = today.day
 					month_final = today.month
-					year_final = today.year									
-				option = input("\nA data final informada foi {date}, deseja alterar?\n> ".format(date=str(day_final)+"/"+str(month_final)+"/"+str(year_final)))
+					year_final = today.year
+					date_final = datetime.datetime(int(year_final), int(month_final), int(day_final))
+				
+				if date_final <= date_initial:
+					print("\nA data final precisa ser maior do que a inicial!")
+					continue													
+				option = input("\nA data final informada foi {date}. Deseja alterar, [s]im ou [n]ão/Enter?\n> ".format(date=str(day_final)+"/"+str(month_final)+"/"+str(year_final)))
 				if option == "": option = "n"
 				if option[0].lower() == 'n': break									
 
@@ -116,8 +127,9 @@ if __name__ == "__main__":
 				format_date = (month, day, year)
 
 				bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', format_date)
-				
 				filters = bmf.get_filters()
+				bmf.get_id(filters)
+				header = bmf.write_header
 				bmf.get_data_from_web()
 
 				prepared_data = bmf.get_prepared_data(filters)
@@ -135,40 +147,47 @@ if __name__ == "__main__":
 						temp_dict[f][key] += prepared_data[f][key]
 
 			print("\nDados coletados com sucesso!")		
-			csv.write_data(temp_dict, path=path)
-			csv.write_accumulated(temp_dict, path=path_accumulated)
-			print("\nOs dados foram gravados com sucesso!")
+			writed1 = csv.write_data(temp_dict, write_header=header, path=path)
+			writed2 = csv.write_accumulated(temp_dict, write_header=header, path=path_accumulated)
+			if not writed1 and not writed2:
+				print("\nOs dados não foram gravados pois já estão no escritos no csv!")
+			else:
+				print("\nOs dados foram gravados com sucesso!")
 
 		elif option == 2:
-
 			db = Database()
-
-			config = db.get_config()
-
-			db.connect(config)		
-			db.create_tables()
-
 			while True:
-				print("\nEntre com a opção desejada:")
-				print("1) Inserir dados no banco dados;")
-				print("2) Truncar tabelas;")
-				print("3) Voltar")
-				option_bd = int(input("> "))
+				try:
+					config = db.get_config()
+					db.connect(config)		
+					db.create_tables()
 
-				if option_bd == 1:
-					if not temp_dict:
-						print("Antes de inserir os dados no banco, esses devem ser coletados!")
-						print("Por favor, execute a opção de coletar os dados e tente novamente!")
-					else:	
-						db.insert_derivatives_contratos(temp_dict)
-						db.insert_derivatives_acumulado(temp_dict)
-				
-				elif option_bd == 2:
-					db.truncate_tables()
+					while True:
+						print("\nEntre com a opção desejada:")
+						print("1) Inserir dados no banco dados;")
+						print("2) Truncar tabelas;")
+						print("3) Voltar")
+						option_bd = int(input("> "))
 
-				elif option_bd == 3: 
-					db.close()					
+						if option_bd == 1:
+							if not temp_dict:
+								print("\nNão existem dados para ser inseridos no banco!")
+								print("Por favor, execute a opção de coletar os dados e tente novamente!")
+							else:	
+								db.insert_derivatives_contratos(temp_dict)
+								db.insert_derivatives_acumulado(temp_dict)
+						
+						elif option_bd == 2:
+							db.truncate_tables()
+
+						elif option_bd == 3: 
+							db.close()					
+							break
 					break
+				except Exception:					
+					print("\nERRO ao se conectar ao banco de dados, verifique se os dados no arquivo de configuração estão corretos e se o serviço do banco de dados está ligado, e tente novamente!")
+					input('\nCaso você tenha alterado o arquivo, pressione "Enter" para continuar.')
+					
 
 		elif option == 3: exit(0)
 		else: continue

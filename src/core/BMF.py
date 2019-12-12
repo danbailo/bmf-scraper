@@ -60,6 +60,20 @@ class BMF:
 				continue
 			i += 1
 
+	def get_id(self, filters, path=os.path.join("..","csv","")):		
+		self.write_header = False
+		self.unique_id = []
+		for derivative in filters:
+			try:
+				with open(path + derivative + ".csv", mode='r') as csv_file:
+					csv_reader = csv.DictReader(csv_file, delimiter=";")
+					for row in csv_reader:
+						if row["IDENTIFICADOR"][:8] not in self.unique_id: 		  #PQ O USUARIO PODE COLOCAR 10 OU 2010, AI MUDA O TAMANHO DA PALARA NO ID
+							self.unique_id.append(row["IDENTIFICADOR"][:8])
+			except FileNotFoundError:
+				self.write_header = True
+				pass
+
 	def get_prepared_data(self, filters):
 		if not self.data: return False
 		prepared_data = defaultdict(lambda: defaultdict(list))
@@ -67,6 +81,9 @@ class BMF:
 			for k,v in self.data[contract].items():				
 				participant = k
 				identifier = self.day + self.month + self.year + "_" + contract + "_" + participant
+
+				if identifier[:8] in self.unique_id: continue
+
 				date = self.day + "/" + self.month + "/" + self.year
 				longcontracts = int(v[0].replace(",", ""))
 				long = float(v[1])
@@ -83,4 +100,5 @@ class BMF:
 				prepared_data[contract]['SHORTCONTRACTS'].append(shortcontracts)
 				prepared_data[contract]['SHORT_'].append(short)
 				prepared_data[contract]['SALDO'].append(balance)
+
 		return prepared_data

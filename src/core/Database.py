@@ -111,7 +111,7 @@ class Database:
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
 					(value[0], date_mysql, value[2], value[3], value[4], value[5], value[6], value[7], value[8]))
 			self.conn.commit()
-		print('\nDados inseridos com sucesso na tabela "dados"!') 
+		print('\nDados inseridos com sucesso na tabela "derivatives_contratos"!') 
 		
 	def insert_derivatives_acumulado(self, all_data):
 		for _, rows in all_data.items():
@@ -163,7 +163,7 @@ class Database:
 			"	FOREIGN KEY(IDENTIFICADOR_ID)"
 			"	REFERENCES derivatives_contratos(IDENTIFICADOR)"			    
 			");")
-		print("Tabelas truncadas com sucesso!") 
+		print("\nTabelas truncadas com sucesso!") 
 
 	def close(self):
 		self.cursor.close()
