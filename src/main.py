@@ -156,15 +156,18 @@ if __name__ == "__main__":
 
 		elif option == 2:
 			db = Database()
+			i = 0
 			while True:
 				try:
 					config = db.get_config()
-					db.connect(config)		
+					connected = False
+					db.connect(config)
+					connected = True
 					db.create_tables()
 
 					while True:
 						print("\nEntre com a opção desejada:")
-						print("1) Inserir dados no banco dados;")
+						print("1) Inserir dados no banco;")
 						print("2) Truncar tabelas;")
 						print("3) Voltar")
 						option_bd = int(input("> "))
@@ -184,10 +187,13 @@ if __name__ == "__main__":
 							db.close()					
 							break
 					break
-				except Exception:					
-					print("\nERRO ao se conectar ao banco de dados, verifique se os dados no arquivo de configuração estão corretos e se o serviço do banco de dados está ligado, e tente novamente!")
-					print("\nSe o erro persistir, pressione CTRL+C para finalizar a execução do programa!")
+				except Exception:
+					i += 1					
+					if not connected:				
+						print("\nERRO ao se conectar ao banco de dados, verifique se os dados no arquivo de configuração estão corretos e se o serviço do banco de dados está ligado e tente novamente!")
 					input('\nCaso você tenha alterado o arquivo, pressione "Enter" para continuar.')
+					if i > 2:
+						print("\nSe o erro persistir, pressione CTRL+C para finalizar a execução do programa!")
 					
 
 		elif option == 3: exit(0)
