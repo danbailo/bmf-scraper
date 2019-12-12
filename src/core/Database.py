@@ -1,4 +1,5 @@
 from collections import defaultdict
+from tqdm import trange
 import mysql.connector
 import datetime
 import os
@@ -93,13 +94,15 @@ class Database:
 			");")
 
 	def insert_derivatives_contratos(self, all_data):
-		for _, rows in all_data.items():
+		print('Inserindo dados na tabela "derivatives_contratos"')
+		for derivative, rows in all_data.items():
+			print("Derivativo:",derivative)
 			temp = []
 			for row in rows.values():
 				temp.append(row)
 			data = list(zip(*temp))
-			for value in data:
-				date = value[1].split("/")
+			for i in trange(len(data)):
+				date = data[i][1].split("/")
 				day = int(date[0])
 				month = int(date[1])
 				if month > 12:
@@ -109,30 +112,32 @@ class Database:
 				self.cursor.execute(
 					"""INSERT IGNORE INTO derivatives_contratos (IDENTIFICADOR, DATA, DERIVATIVO, PARTICIPANTE, LONGCONTRACTS, LONG_, SHORTCONTRACTS, SHORT_, SALDO)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-					(value[0], date_mysql, value[2], value[3], value[4], value[5], value[6], value[7], value[8]))
+					(data[i][0], date_mysql, data[i][2], data[i][3], data[i][4], data[i][5], data[i][6], data[i][7], data[i][8]))
 			self.conn.commit()
-		print('\nDados inseridos com sucesso na tabela "derivatives_contratos"!') 
+		print('Dados inseridos com sucesso na tabela "derivatives_contratos"!') 
 		
 	def insert_derivatives_acumulado(self, all_data):
-		for _, rows in all_data.items():
+		print('Inserindo dados na tabela "derivatives_acumulado"')
+		for derivative, rows in all_data.items():
+			print("Derivativo:",derivative)
 			accumulated = defaultdict(int)
 			temp = []
 			for row in rows.values():
 				temp.append(row)
 			data = list(zip(*temp))
-			for value in data:
-				date = value[1].split("/")
+			for i in trange(len(data)):
+				date = data[i][1].split("/")
 				day = int(date[0])
 				month = int(date[1])
 				if month > 12:
 					month = 12
 				year = int(date[2])
 				date_mysql = datetime.datetime(year, month, day)				
-				accumulated[value[3]] += value[8]
+				accumulated[data[i][3]] += data[i][8]
 				self.cursor.execute(
 					"""INSERT IGNORE INTO derivatives_acumulado (IDENTIFICADOR_ID, DATA, PARTICIPANTE, SALDO, ACUMULADO)
 					VALUES (%s, %s, %s, %s, %s)""",
-					(value[0], date_mysql, value[3], value[8], accumulated[value[3]]))
+					(data[i][0], date_mysql, data[i][3], data[i][8], accumulated[data[i][3]]))
 			self.conn.commit()
 		print('Dados inseridos com sucesso na tabela "derivatives_acumulado"!') 
 

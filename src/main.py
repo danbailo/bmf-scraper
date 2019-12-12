@@ -5,6 +5,8 @@ from sys import platform
 import datetime
 import os
 
+AUTO_MYSQL = False
+
 def daterange(initial_date, final_date):
 	for n in trange(int ((final_date - initial_date).days)):
 		yield initial_date + timedelta(n)
@@ -39,7 +41,10 @@ def get_path(accumulated=False):
 	return path
 
 if __name__ == "__main__":
-
+	csv = CSV()
+	db = Database()
+	temp_dict = {}	
+	
 	while True:		
 		print("\nEntre com a opção desejada:")
 		print("1) Coletar dados;")
@@ -49,8 +54,6 @@ if __name__ == "__main__":
 			option = int(input("> "))
 		except Exception:
 			continue
-
-		csv = CSV()
 
 		if option == 1:
 			path = get_path()
@@ -154,47 +157,56 @@ if __name__ == "__main__":
 			else:
 				print("\nOs dados foram gravados com sucesso!")
 
+			if AUTO_MYSQL:
+				print("\nInserindo dados automaticamente no banco.")
+				config = db.get_config()
+				db.connect(config)
+				db.create_tables()				
+				db.insert_derivatives_contratos(temp_dict)
+				print()
+				db.insert_derivatives_acumulado(temp_dict)
+
 		elif option == 2:
-			db = Database()
-			i = 0
 			while True:
 				try:
 					config = db.get_config()
-					connected = False
 					db.connect(config)
-					connected = True
 					db.create_tables()
 
 					while True:
 						print("\nEntre com a opção desejada:")
 						print("1) Inserir dados no banco;")
-						print("2) Truncar tabelas;")
-						print("3) Voltar")
+						print("2) Auto Insert MySQL;")
+						print("3) Truncar tabelas;")
+						print("4) Voltar")
 						option_bd = int(input("> "))
 
 						if option_bd == 1:
 							if not temp_dict:
 								print("\nNão existem dados para ser inseridos no banco!")
 								print("Por favor, execute a opção de coletar os dados e tente novamente!")
-							else:	
+							else:
 								db.insert_derivatives_contratos(temp_dict)
+								print()
 								db.insert_derivatives_acumulado(temp_dict)
 						
 						elif option_bd == 2:
+							AUTO_MYSQL = True
+							print("Inserir dados automaticamente ligado!")
+							
+						elif option_bd == 3:
 							db.truncate_tables()
 
-						elif option_bd == 3: 
+						elif option_bd == 4: 
 							db.close()					
 							break
 					break
-				except Exception:
-					i += 1					
-					if not connected:				
-						print("\nERRO ao se conectar ao banco de dados, verifique se os dados no arquivo de configuração estão corretos e se o serviço do banco de dados está ligado e tente novamente!")
+				except Exception as err:
+					print(err)
+					print("\nERRO ao se conectar ao banco de dados, verifique se os dados no arquivo de configuração estão corretos e se o serviço do banco de dados está ligado e tente novamente!")
 					input('\nCaso você tenha alterado o arquivo, pressione "Enter" para continuar.')
 					if i > 2:
 						print("\nSe o erro persistir, pressione CTRL+C para finalizar a execução do programa!")
 					
-
 		elif option == 3: exit(0)
 		else: continue

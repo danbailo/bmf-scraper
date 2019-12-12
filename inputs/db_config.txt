@@ -1,5 +1,5 @@
-user: SUkcBcptY7
-password: hWwVgTZZpR
-database: SUkcBcptY7
+user: kF9iqRpf3f
+password: 0OPzUvxr6o
+database: kF9iqRpf3f
 host: remotemysql.com
 port:
