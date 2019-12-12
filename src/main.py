@@ -186,6 +186,7 @@ if __name__ == "__main__":
 					break
 				except Exception:					
 					print("\nERRO ao se conectar ao banco de dados, verifique se os dados no arquivo de configuração estão corretos e se o serviço do banco de dados está ligado, e tente novamente!")
+					print("\nSe o erro persistir, pressione CTRL+C para finalizar a execução do programa!")
 					input('\nCaso você tenha alterado o arquivo, pressione "Enter" para continuar.')
 					
 
