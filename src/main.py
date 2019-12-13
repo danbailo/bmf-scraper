@@ -41,6 +41,7 @@ def get_path(accumulated=False):
 	return path
 
 if __name__ == "__main__":
+
 	csv = CSV()
 	db = Database()
 	temp_dict = {}	
@@ -64,7 +65,7 @@ if __name__ == "__main__":
 			if not os.path.isdir(path_accumulated):
 				path_accumulated = os.path.join("..","csv","accumulated","")
 
-			print("\nEntre com o intervalo de busca - [INICIAL, FINAL)\n")
+			print("\nEntre com o intervalo de busca - [INICIAL, FINAL]\n")
 
 			while True:
 				print("Data INICIAL - dia/mês/ano")
@@ -74,7 +75,8 @@ if __name__ == "__main__":
 						print("\nPor favor, insira o ano no formato XXXX!")
 						continue
 					option = input("\nA data inicial informada foi {date}. Deseja alterar, [s]im ou [n]ão/Enter?\n> ".format(date=day_initial+"/"+month_initial+"/"+year_initial))
-					date_initial = datetime.datetime(int(year_initial), int(month_initial),int(day_initial))
+					#date_initial = datetime.datetime(int(year_initial), int(month_initial),int(day_initial))
+					initial_date = date(int(year_initial), int(month_initial), int(day_initial))
 					if option == "": option = "n"
 					if option[0].lower() == 'n': break					
 				except Exception:
@@ -85,7 +87,9 @@ if __name__ == "__main__":
 				today = date.today()
 				try:
 					day_final, month_final, year_final = input().split("/")
-					date_final = datetime.datetime(int(year_final), int(month_final), int(day_final))
+					final_date = date(int(year_final), int(month_final), int(day_final))
+					final_date = final_date + datetime.timedelta(days=1)
+
 					if len(year_final) != 4 and year_final != "":
 						print("\nPor favor, insira o ano no formato XXXX!")
 						continue					
@@ -100,9 +104,9 @@ if __name__ == "__main__":
 					day_final = today.day
 					month_final = today.month
 					year_final = today.year
-					date_final = datetime.datetime(int(year_final), int(month_final), int(day_final))
+					final_date = date(int(year_final), int(month_final), int(day_final))
 				
-				if date_final <= date_initial:
+				if final_date <= initial_date:
 					print("\nA data final precisa ser maior do que a inicial!")
 					continue													
 				option = input("\nA data final informada foi {date}. Deseja alterar, [s]im ou [n]ão/Enter?\n> ".format(date=str(day_final)+"/"+str(month_final)+"/"+str(year_final)))
@@ -112,11 +116,12 @@ if __name__ == "__main__":
 			print()
 
 			initial_date = date(int(year_initial), int(month_initial), int(day_initial))
-			final_date = date(int(year_final), int(month_final), int(day_final))	
+			final_date = date(int(year_final), int(month_final), int(day_final))
+			final_date = final_date + datetime.timedelta(days=1)
 			temp_dict = {}
 			keys = ['IDENTIFICADOR', 'DATA', 'DERIVATIVO', 'PARTICIPANTE', 'LONGCONTRACTS', 'LONG_', 'SHORTCONTRACTS', 'SHORT_', 'SALDO']
 
-			print("Coletando dados...")
+			print("Coletando dados de {initial} até {final}.".format(initial=initial_date, final=final_date))
 			for single_date in daterange(initial_date, final_date):				
 				day = str(single_date.day)
 				month = str(single_date.month)
@@ -130,12 +135,15 @@ if __name__ == "__main__":
 				format_date = (month, day, year)
 
 				bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', format_date)
+
 				filters = bmf.get_filters()
 				bmf.get_id(filters)
+				last_accumulated = bmf.get_accumulated(filters)
+
 				header = bmf.write_header
 				bmf.get_data_from_web()
 
-				prepared_data = bmf.get_prepared_data(filters)
+				prepared_data = bmf.prepare_data(filters)
 				if not prepared_data: 
 					continue
 
@@ -150,8 +158,11 @@ if __name__ == "__main__":
 						temp_dict[f][key] += prepared_data[f][key]
 
 			print("\nDados coletados com sucesso!")		
+
+			#print(last_accumulated)
+
 			writed1 = csv.write_data(temp_dict, write_header=header, path=path)
-			writed2 = csv.write_accumulated(temp_dict, write_header=header, path=path_accumulated)
+			writed2 = csv.write_accumulated(temp_dict, last_accumulated=last_accumulated ,write_header=header, path=path_accumulated)
 			if not writed1 and not writed2:
 				print("\nOs dados não foram gravados pois já estão no escritos no csv!")
 			else:
@@ -179,7 +190,10 @@ if __name__ == "__main__":
 						print("2) Auto Insert MySQL;")
 						print("3) Truncar tabelas;")
 						print("4) Voltar")
-						option_bd = int(input("> "))
+						try:
+							option_bd = int(input("> "))
+						except ValueError:
+							continue
 
 						if option_bd == 1:
 							if not temp_dict:
@@ -205,8 +219,7 @@ if __name__ == "__main__":
 					print(err)
 					print("\nERRO ao se conectar ao banco de dados, verifique se os dados no arquivo de configuração estão corretos e se o serviço do banco de dados está ligado e tente novamente!")
 					input('\nCaso você tenha alterado o arquivo, pressione "Enter" para continuar.')
-					if i > 2:
-						print("\nSe o erro persistir, pressione CTRL+C para finalizar a execução do programa!")
+					print("\nSe o erro persistir, pressione CTRL+C para finalizar a execução do programa!")
 					
 		elif option == 3: exit(0)
 		else: continue

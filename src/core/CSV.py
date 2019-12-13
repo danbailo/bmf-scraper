@@ -11,11 +11,11 @@ class CSV:
 	def write_data(self, all_data, write_header, path=os.path.join("..","csv","")):
 		if len(all_data) == 0: 
 			return False
-		for contract, rows in all_data.items():
+		for derivative, rows in all_data.items():
 			self.fields = list(rows.keys())
 			temp = []
 			try:
-				with open(path + contract.upper() + ".csv", mode="a", newline='\n', encoding='utf-8') as csv_file:
+				with open(path + derivative.upper() + ".csv", mode="a", newline='\n', encoding='utf-8') as csv_file:
 					writer = csv.DictWriter(csv_file, fieldnames=self.fields, delimiter=";")
 					if write_header:
 						writer.writeheader()
@@ -40,15 +40,15 @@ class CSV:
 				exit(-1)
 		return True
 
-	def write_accumulated(self, all_data, write_header, path=os.path.join("..","csv","ACCUMULATED","")):
+	def write_accumulated(self, all_data, write_header, last_accumulated, path=os.path.join("..","csv","ACCUMULATED","")):
 		if len(all_data) == 0: 
-			return False		
+			return False			
 		fields = ["DATA", "PARTICIPANTE", "SALDO", "ACUMULADO"]
-		for contract, rows in all_data.items():
+		for derivative, rows in all_data.items():
 			accumulated = defaultdict(int)
 			temp = []
 			try:
-				with open(path + contract.upper() + " ACCUMULATED.csv", mode="a", newline='\n', encoding='utf-8') as csv_file:
+				with open(path + derivative.upper() + " ACCUMULATED.csv", mode="a", newline='\n', encoding='utf-8') as csv_file:
 					writer = csv.DictWriter(csv_file, fieldnames=fields, delimiter=";")
 					if write_header:
 						writer.writeheader()
@@ -57,12 +57,22 @@ class CSV:
 					data = list(zip(*temp))
 					for value in data:
 						accumulated[value[3]] += value[8]
-						writer.writerow({
-							fields[0]: value[1],
-							fields[1]: value[3],
-							fields[2]: value[8],
-							fields[3]: accumulated[value[3]]
-						})
+						try:
+							writer.writerow({
+								fields[0]: value[1],
+								fields[1]: value[3],
+								fields[2]: value[8],
+								fields[3]: last_accumulated[derivative.upper()][value[3]] + value[8]
+							})			
+						except TypeError:					
+							writer.writerow({
+								fields[0]: value[1],
+								fields[1]: value[3],
+								fields[2]: value[8],
+								fields[3]: accumulated[value[3]]
+							})
+					
+
 			except PermissionError:
 				print("\nERRO ao gravar arquivo .csv!")
 				print("Por favor, feche todos os arquivos .csv aberto e execute o programa novamente!")

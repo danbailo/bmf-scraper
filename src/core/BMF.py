@@ -60,31 +60,45 @@ class BMF:
 				continue
 			i += 1
 
-	def get_id(self, filters, path=os.path.join("..","csv","")):		
+	def get_id(self, filters, path=os.path.join("..", "csv", "")):		
 		self.write_header = False
-		self.unique_id = []
+		self.dates = set()
+		self.last_date = ""
 		for derivative in filters:
 			try:
 				with open(path + derivative + ".csv", mode='r') as csv_file:
 					csv_reader = csv.DictReader(csv_file, delimiter=";")
 					for row in csv_reader:
-						if row["IDENTIFICADOR"][:8] not in self.unique_id: 		  #PQ O USUARIO PODE COLOCAR 10 OU 2010, AI MUDA O TAMANHO DA PALARA NO ID
-							self.unique_id.append(row["IDENTIFICADOR"][:8])
+						self.dates.add(row["DATA"])
+						self.last_date = row["DATA"]
 			except FileNotFoundError:
 				self.write_header = True
 				pass
 
-	def get_prepared_data(self, filters):
+	def get_accumulated(self, filters, path=os.path.join("..", "csv", "ACCUMULATED", "")):
+		last_accumulated = defaultdict(lambda: defaultdict(int))
+		for derivative in filters:
+			try:
+				with open(path + derivative.upper() + " ACCUMULATED.csv", mode='r') as csv_file:
+					csv_reader = csv.DictReader(csv_file, delimiter=";")
+					for row in csv_reader:
+						if row["DATA"] == self.last_date:
+							last_accumulated[derivative.upper()][row["PARTICIPANTE"]] = int(row["ACUMULADO"])
+			except FileNotFoundError:
+				return False
+		return last_accumulated
+
+	def prepare_data(self, filters):
 		if not self.data: return False
 		prepared_data = defaultdict(lambda: defaultdict(list))
 		for contract in filters:
 			for k,v in self.data[contract].items():				
 				participant = k
-				identifier = self.day + self.month + self.year + "_" + contract + "_" + participant
-
-				if identifier[:8] in self.unique_id: continue
-
 				date = self.day + "/" + self.month + "/" + self.year
+
+				if date in self.dates: continue
+
+				identifier = self.day + self.month + self.year + "_" + contract + "_" + participant
 				longcontracts = int(v[0].replace(",", ""))
 				long = float(v[1])
 				shortcontracts = int(v[2].replace(",", ""))
