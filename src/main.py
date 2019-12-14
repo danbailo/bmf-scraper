@@ -117,11 +117,11 @@ if __name__ == "__main__":
 
 			initial_date = date(int(year_initial), int(month_initial), int(day_initial))
 			final_date = date(int(year_final), int(month_final), int(day_final))
-			final_date = final_date + datetime.timedelta(days=1)
 			temp_dict = {}
 			keys = ['IDENTIFICADOR', 'DATA', 'DERIVATIVO', 'PARTICIPANTE', 'LONGCONTRACTS', 'LONG_', 'SHORTCONTRACTS', 'SHORT_', 'SALDO']
 
 			print("Coletando dados de {initial} até {final}.".format(initial=initial_date.strftime("%d/%m/%Y"), final=final_date.strftime("%d/%m/%Y")))
+			final_date = final_date + datetime.timedelta(days=1) #por causa do range
 			for single_date in daterange(initial_date, final_date):				
 				day = str(single_date.day)
 				month = str(single_date.month)
