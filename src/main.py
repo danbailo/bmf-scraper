@@ -42,9 +42,11 @@ def get_path(accumulated=False):
 
 if __name__ == "__main__":
 
+	bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp')
+	filters = bmf.get_filters()
 	csv = CSV()
 	db = Database()
-	temp_dict = {}	
+	temp_dict = {}
 	
 	while True:		
 		print("\nEntre com a opção desejada:")
@@ -133,10 +135,8 @@ if __name__ == "__main__":
 					month = "0" + month			
 
 				format_date = (month, day, year)
-
-				bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp', format_date)
-
-				filters = bmf.get_filters()
+				bmf.set_date(format_date)			
+				
 				bmf.get_id(filters)
 				last_accumulated = bmf.get_accumulated(filters)
 
@@ -187,9 +187,10 @@ if __name__ == "__main__":
 					while True:
 						print("\nEntre com a opção desejada:")
 						print("1) Inserir dados no banco;")
-						print("2) Auto Insert MySQL;")
-						print("3) Truncar tabelas;")
-						print("4) Voltar")
+						print("2) Inserir dados no banco por csv;")
+						print("3) Auto Insert MySQL;")
+						print("4) Truncar tabelas;")
+						print("5) Voltar")
 						try:
 							option_bd = int(input("> "))
 						except ValueError:
@@ -203,23 +204,28 @@ if __name__ == "__main__":
 								db.insert_derivatives_contratos(temp_dict)
 								print()
 								db.insert_derivatives_acumulado(temp_dict)
-						
+
 						elif option_bd == 2:
+							db.insert_from_csv_contratos(filters)
+							db.insert_from_csv_acumulado(filters)
+
+						elif option_bd == 3:
 							AUTO_MYSQL = True
 							print("Inserir dados automaticamente ligado!")
 							
-						elif option_bd == 3:
+						elif option_bd == 4:
 							db.truncate_tables()
 
-						elif option_bd == 4: 
+						elif option_bd == 5: 
 							db.close()					
-							break
+							break						
 					break
 				except Exception as err:
 					print(err)
 					print("\nERRO ao se conectar ao banco de dados, verifique se os dados no arquivo de configuração estão corretos e se o serviço do banco de dados está ligado e tente novamente!")
 					input('\nCaso você tenha alterado o arquivo, pressione "Enter" para continuar.')
 					print("\nSe o erro persistir, pressione CTRL+C para finalizar a execução do programa!")
+					continue
 					
 		elif option == 3: exit(0)
 		else: continue

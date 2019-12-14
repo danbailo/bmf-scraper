@@ -4,6 +4,7 @@ import mysql.connector
 import datetime
 import os
 import re
+import csv
 
 class Database:
 	def __init__(self):
@@ -62,8 +63,7 @@ class Database:
 				self.cursor.execute("USE {database};".format(database=database))
 			except Exception:
 				print("\nERRO tentar se conectar ao banco de dados!")
-				print("Por favor, instale o banco de dados que foi disponibilizado no arquivo README.md ou verifique os dados e tente novamente!")
-				exit(-1)			
+				print("Por favor, instale o banco de dados que foi disponibilizado no arquivo README.md ou verifique os dados e tente novamente!")		
 
 		print("\nConectado ao banco de dados com sucesso!")
 
@@ -92,6 +92,58 @@ class Database:
 			"	FOREIGN KEY(IDENTIFICADOR_ID)"
 			"	REFERENCES derivatives_contratos(IDENTIFICADOR)"			    
 			");")
+
+	def insert_from_csv_contratos(self, filters, path=os.path.join("..", "csv", "")):
+		keys = ["IDENTIFICADOR", "DATA", "DERIVATIVO", "PARTICIPANTE", "LONGCONTRACTS", "LONG_", "SHORTCONTRACTS", "SHORT_", "SALDO"]
+		print('\nInserindo dados na tabela "derivatives_contratos"')
+		for derivative in filters:
+			try:
+				with open(path + derivative.upper() + ".csv", mode='r') as csv_file:
+					csv_reader = csv.DictReader(csv_file, delimiter=";")
+					for row in csv_reader:
+						date = row[keys[1]].split("/")
+						day = int(date[0])
+						month = int(date[1])
+						year = int(date[2])	
+						date_mysql = datetime.datetime(year, month, day)				
+						self.cursor.execute(
+							"""INSERT IGNORE INTO derivatives_contratos (IDENTIFICADOR, DATA, DERIVATIVO, PARTICIPANTE, LONGCONTRACTS, LONG_, SHORTCONTRACTS, SHORT_, SALDO)
+							VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+							(row[keys[0]], date_mysql, row[keys[2]], row[keys[3]], row[keys[4]], row[keys[5]], row[keys[6]], row[keys[7]], row[keys[8]]))
+					self.conn.commit()
+			except FileNotFoundError:
+				print('\nERRO ao tentar inserir dados na tabela "derivatives_contratos"!')
+				print("Não existem arquivos csv para serem lidos!")
+				print("Por favor, realize a coleta de dados antes de tentar inseri-los no banco!")
+				return False
+				
+		print('Dados inseridos com sucesso na tabela "derivatives_contratos"!') 		
+
+	def insert_from_csv_acumulado(self, filters, path=os.path.join("..", "csv", "ACCUMULATED", "")):
+		keys = ["DATA", "PARTICIPANTE", "SALDO", "ACUMULADO"]
+		print('\nInserindo dados na tabela "derivatives_acumulado"')
+		for derivative in filters:
+			try:
+				with open(path + derivative.upper() + " ACCUMULATED.csv", mode='r') as csv_file:
+					csv_reader = csv.DictReader(csv_file, delimiter=";")
+					for row in csv_reader:
+						date = row[keys[0]].split("/")
+						day = int(date[0])
+						month = int(date[1])
+						year = int(date[2])	
+						identifier = date[0] + date[1] + date[2] + "_" + derivative + "_" + row[keys[1]]
+						date_mysql = datetime.datetime(year, month, day)		
+						self.cursor.execute(
+							"""INSERT IGNORE INTO derivatives_acumulado (IDENTIFICADOR_ID, DATA, PARTICIPANTE, SALDO, ACUMULADO)
+							VALUES (%s, %s, %s, %s, %s)""",
+							(identifier, date_mysql, row[keys[1]], row[keys[2]], row[keys[3]]))
+					self.conn.commit()
+			except FileNotFoundError:
+				print('\nERRO ao tentar inserir dados na tabela "derivatives_acumulado"!')
+				print("Não existem arquivos csv para serem lidos!")
+				print("Por favor, realize a coleta de dados antes de tentar inseri-los no banco!")
+				return False				
+		print('Dados inseridos com sucesso na tabela "derivatives_acumulado"!')
 
 	def insert_derivatives_contratos(self, all_data):
 		print('Inserindo dados na tabela "derivatives_contratos"')
