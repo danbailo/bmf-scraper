@@ -10,6 +10,8 @@ As tabelas estão ligadas por uma chave estregeira, onde esta está nomeada de `
 ---
 ## Requisitos
 
+### Instalação dos requisitos no Windows.
+
 **OBS: Caso algum passo da instalação não esteja numa imagem, basta avançar!**
 
 * `Python - versão 3.7.3 (Testado)` - [Download](https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe)
@@ -33,12 +35,12 @@ Dessa forma, seu ambiente já está pronto para armazenar os dados no banco!
 Ao realizar a instalação dessa forma, o XAMPP configura esse usuário e senha padrão de utilização.
 
 * `usuário = root`
-* `senha = ""` - Na execução do programa, basta pressionar um ENTER!
+* `senha = ""` - Neste caso, o usuário `root` não possui nenhuma senha!
 
 ---
 ## Dependências
 
-Para instalar as dependências, abra PowerShell/prompt de comando no diretório corrente e execute o comando abaixo:
+Para instalar as dependências, abra PowerShell/Prompt de Comando no diretório corrente e execute o comando abaixo:
 
 * `python -m pip install -r requirements.txt --user`
 
@@ -51,39 +53,19 @@ Para instalar as dependências, abra PowerShell/prompt de comando no diretório 
 ---
 ## Como usar
 
-Para executar o programa, abra um PowerShell/prompt de comando no diretório corrente e execute os comandos a seguir.
+1. Configurar o arquivo [db_config.txt](inputs/db_config.txt) com as informações do banco de dados no qual os dados devem ser armazenados.
 
-* `cd src` - Entra no diretório que está o programa principal.
-* `python main.py` - **Executa o programa**
+Para executar o programa, abra um Terminal/PowerShell/Prompt de Comando no diretório corrente e execute os comandos a seguir.
 
-ou
+* Windows
+
+*ALTERNATIVA*
 
 Simplesmente entre na pasta `src` e dê dois cliques para abrir o arquivo `main.py` que o mesmo irá abrir automaticamente.
 
+* Linux/Windows
+
+    * `cd src` - Entra no diretório que está o programa principal.
+    * `python main.py` - **Executa o programa**
+
 Feito isso, basta seguir as opções do menu.
-
-**Ao digitar a data, é muito importante que o ano, inicial e final, estejam no mesmo formato.**
-
-**Exemplo: 10 e 10 ou 2010 e 2010.**
-
-**Não coloque 10 e 2010 ou 2010 e 10!**
-
-### Observações
-
-Após se conectar ao banco de dados, o mesmo solicitará o usuário, senha, nome do banco, IP e porta da conexão.
-
-Para executar localmente e com a configuração atual, ou seja, após instalar o XAMPP, o único dado necessário para realizar a conexão é o usuário. Os campos que estão em branco, simplesmente foi pressionado um ENTER. 
-
-Caso o usuário não entre com nenhum nome para o banco de dados, por padrão foi definido **"bmf"**.
-
-![](imgs/note.png)
-
----
-
-### phpMyAdmin
-
-Assim que os serviços do XAMPP forem iniciados, no caso o Apache e o MySQL, é possível manipular graficamente os dados por meio do **phpMyAdmin**.
-
-Para acessá-lo, basta abrir um navegador e digitar http://localhost/phpmyadmin.
-
-![](imgs/database.png)
