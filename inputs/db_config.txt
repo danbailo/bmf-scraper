@@ -1,5 +1,5 @@
-user: kF9iqRpf3f
-password: 0OPzUvxr6o
-database: kF9iqRpf3f
-host: remotemysql.com
+user: root
+password: 
+database: marc4815_indicadores
+host: 
 port:
