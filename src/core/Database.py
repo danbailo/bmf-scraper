@@ -146,7 +146,7 @@ class Database:
 		print('Dados inseridos com sucesso na tabela "derivatives_acumulado"!')
 
 	def insert_derivatives_contratos(self, all_data):
-		print('Inserindo dados na tabela "derivatives_contratos"')
+		print('\nInserindo dados na tabela "derivatives_contratos"')
 		for derivative, rows in all_data.items():
 			print("Derivativo:",derivative)
 			temp = []
@@ -169,7 +169,7 @@ class Database:
 		print('Dados inseridos com sucesso na tabela "derivatives_contratos"!') 
 		
 	def insert_derivatives_acumulado(self, all_data):
-		print('Inserindo dados na tabela "derivatives_acumulado"')
+		print('\nInserindo dados na tabela "derivatives_acumulado"')
 		for derivative, rows in all_data.items():
 			print("Derivativo:",derivative)
 			accumulated = defaultdict(int)

@@ -51,8 +51,9 @@ if __name__ == "__main__":
 	while True:		
 		print("\nEntre com a opção desejada:")
 		print("1) Coletar dados;")
-		print("2) Conectar no banco de dados;")
-		print("3) Sair")
+		print("2) Atualizar dados;")
+		print("3) Conectar no banco de dados;")
+		print("4) Sair")
 		try:
 			option = int(input("> "))
 		except Exception:
@@ -77,7 +78,6 @@ if __name__ == "__main__":
 						print("\nPor favor, insira o ano no formato XXXX!")
 						continue
 					option = input("\nA data inicial informada foi {date}. Deseja alterar, [s]im ou [n]ão/Enter?\n> ".format(date=day_initial+"/"+month_initial+"/"+year_initial))
-					#date_initial = datetime.datetime(int(year_initial), int(month_initial),int(day_initial))
 					initial_date = date(int(year_initial), int(month_initial), int(day_initial))
 					if option == "": option = "n"
 					if option[0].lower() == 'n': break					
@@ -159,8 +159,6 @@ if __name__ == "__main__":
 
 			print("\nDados coletados com sucesso!")		
 
-			#print(last_accumulated)
-
 			writed1 = csv.write_data(temp_dict, write_header=header, path=path)
 			writed2 = csv.write_accumulated(temp_dict, last_accumulated=last_accumulated ,write_header=header, path=path_accumulated)
 			if not writed1 and not writed2:
@@ -178,6 +176,69 @@ if __name__ == "__main__":
 				db.insert_derivatives_acumulado(temp_dict)
 
 		elif option == 2:
+			today = date.today()
+			bmf.get_id(filters)
+			last_accumulated = bmf.get_accumulated(filters)
+
+			last_date_str = bmf.last_date
+			last_day, last_month, last_year = last_date_str.split("/")
+			last_date = date(int(last_year), int(last_month), int(last_day))
+
+			path = os.path.join("..","csv","")
+			path_accumulated = os.path.join("..","csv","accumulated","")
+
+			print("\nAtualizando os dados, de {last} até {final}.".format(last=last_date.strftime("%d/%m/%Y"), final=today.strftime("%d/%m/%Y")))
+			today = today + datetime.timedelta(days=1) #por causa do range
+			for single_date in daterange(last_date, today):				
+				day = str(single_date.day)
+				month = str(single_date.month)
+				year = str(single_date.year)
+				
+				if len(day) == 1:
+					day = "0" + day
+				if len(month) == 1:
+					month = "0" + month			
+
+				format_date = (month, day, year)
+				bmf.set_date(format_date)			
+
+				header = bmf.write_header
+				bmf.get_data_from_web()
+
+				prepared_data = bmf.prepare_data(filters)
+				if not prepared_data: 
+					continue
+
+				state = 0
+				if not temp_dict: 
+					temp_dict = prepared_data.copy()
+					state = 1
+
+				for f in filters:
+					for key in keys:
+						if state == 1: continue		
+						temp_dict[f][key] += prepared_data[f][key]
+
+			print("\nDados atualizados com sucesso!")		
+
+			writed1 = csv.write_data(temp_dict, write_header=header, path=path)
+			writed2 = csv.write_accumulated(temp_dict, last_accumulated=last_accumulated ,write_header=header, path=path_accumulated)
+			if not writed1 and not writed2:
+				print("\nOs dados não foram gravados pois já estão no escritos no csv!")
+			else:
+				print("\nOs dados foram gravados com sucesso!")
+
+			if AUTO_MYSQL:
+				print("\nInserindo dados automaticamente no banco.")
+				config = db.get_config()
+				db.connect(config)
+				db.create_tables()				
+				db.insert_derivatives_contratos(temp_dict)
+				print()
+				db.insert_derivatives_acumulado(temp_dict)
+
+
+		elif option == 3:
 			while True:
 				try:
 					config = db.get_config()
@@ -227,5 +288,5 @@ if __name__ == "__main__":
 					print("\nSe o erro persistir, pressione CTRL+C para finalizar a execução do programa!")
 					continue
 					
-		elif option == 3: exit(0)
+		elif option == 4: exit(0)
 		else: continue
