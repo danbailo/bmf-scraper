@@ -37,7 +37,8 @@ class CSV:
 			except PermissionError:
 				print("\nERRO ao gravar arquivo .csv!")
 				print("Por favor, feche todos os arquivos .csv aberto e execute o programa novamente!")
-				exit(-1)
+				input('\nCaso você tenha fechado o arquivo, pressione "Enter" para continuar.')
+				continue
 		return True
 
 	def write_accumulated(self, all_data, write_header, last_accumulated, path=os.path.join("..","csv","ACCUMULATED","")):
@@ -57,21 +58,23 @@ class CSV:
 					data = list(zip(*temp))
 					for value in data:
 						accumulated[value[3]] += value[8]
-						try:
+						try:							
+							last = last_accumulated[derivative.upper()][value[3]] + value[8]
+							last_accumulated[derivative.upper()][value[3]] = last
 							writer.writerow({
 								fields[0]: value[1],
 								fields[1]: value[3],
 								fields[2]: value[8],
-								fields[3]: last_accumulated[derivative.upper()][value[3]] + value[8]
-							})			
+								fields[3]: last
+							})
+
 						except TypeError:					
 							writer.writerow({
 								fields[0]: value[1],
 								fields[1]: value[3],
 								fields[2]: value[8],
 								fields[3]: accumulated[value[3]]
-							})
-					
+							})				
 
 			except PermissionError:
 				print("\nERRO ao gravar arquivo .csv!")
