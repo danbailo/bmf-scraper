@@ -66,7 +66,7 @@ if __name__ == "__main__":
 			if not os.path.isdir(path):
 				path = os.path.join("..","csv","")
 			if not os.path.isdir(path_accumulated):
-				path_accumulated = os.path.join("..","csv","accumulated","")
+				path_accumulated = os.path.join("..","csv","ACCUMULATED","")
 
 			print("\nEntre com o intervalo de busca - [INICIAL, FINAL]\n")
 
@@ -136,15 +136,15 @@ if __name__ == "__main__":
 
 				format_date = (month, day, year)
 				bmf.set_date(format_date)			
-				
 				bmf.get_id(filters)
 				last_accumulated = bmf.get_accumulated(filters)
 
 				header = bmf.write_header
-				bmf.get_data_from_web()
+				if bmf.get_data_from_web() is False:
+					continue
 
 				prepared_data = bmf.prepare_data(filters)
-				if not prepared_data: 
+				if not prepared_data:					
 					continue
 
 				state = 0
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 						if state == 1: continue		
 						temp_dict[f][key] += prepared_data[f][key]
 
-			print("\nDados coletados com sucesso!")		
+			print("\nDados coletados com sucesso!")				
 
 			writed1 = csv.write_data(temp_dict, write_header=header, path=path)
 			writed2 = csv.write_accumulated(temp_dict, last_accumulated=last_accumulated ,write_header=header, path=path_accumulated)
