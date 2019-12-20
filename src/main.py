@@ -44,6 +44,7 @@ if __name__ == "__main__":
 
 	bmf = BMF('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-tipo-de-participante-enUS.asp')
 	filters = bmf.get_filters()
+	keys = ['IDENTIFICADOR', 'DATA', 'DERIVATIVO', 'PARTICIPANTE', 'LONGCONTRACTS', 'LONG_', 'SHORTCONTRACTS', 'SHORT_', 'SALDO']
 	csv = CSV()
 	db = Database()
 	temp_dict = {}
@@ -119,8 +120,7 @@ if __name__ == "__main__":
 
 			initial_date = date(int(year_initial), int(month_initial), int(day_initial))
 			final_date = date(int(year_final), int(month_final), int(day_final))
-			temp_dict = {}
-			keys = ['IDENTIFICADOR', 'DATA', 'DERIVATIVO', 'PARTICIPANTE', 'LONGCONTRACTS', 'LONG_', 'SHORTCONTRACTS', 'SHORT_', 'SALDO']
+			temp_dict = {}			
 
 			print("Coletando dados de {initial} até {final}.".format(initial=initial_date.strftime("%d/%m/%Y"), final=final_date.strftime("%d/%m/%Y")))
 			final_date = final_date + datetime.timedelta(days=1) #por causa do range
@@ -181,11 +181,14 @@ if __name__ == "__main__":
 			last_accumulated = bmf.get_accumulated(filters)
 
 			last_date_str = bmf.last_date
+			if not last_accumulated:
+				print("\nPor favor, execute a coleta de dados primeiro antes de realizar a atualização!")
+				continue
 			last_day, last_month, last_year = last_date_str.split("/")
 			last_date = date(int(last_year), int(last_month), int(last_day))
 
 			path = os.path.join("..","csv","")
-			path_accumulated = os.path.join("..","csv","accumulated","")
+			path_accumulated = os.path.join("..","csv","ACCUMULATED","")
 
 			print("\nAtualizando os dados, de {last} até {final}.".format(last=last_date.strftime("%d/%m/%Y"), final=today.strftime("%d/%m/%Y")))
 			today = today + datetime.timedelta(days=1) #por causa do range
@@ -202,7 +205,6 @@ if __name__ == "__main__":
 				format_date = (month, day, year)
 				bmf.set_date(format_date)			
 
-				header = bmf.write_header
 				bmf.get_data_from_web()
 
 				prepared_data = bmf.prepare_data(filters)
@@ -221,8 +223,8 @@ if __name__ == "__main__":
 
 			print("\nDados atualizados com sucesso!")		
 
-			writed1 = csv.write_data(temp_dict, write_header=header, path=path)
-			writed2 = csv.write_accumulated(temp_dict, last_accumulated=last_accumulated ,write_header=header, path=path_accumulated)
+			writed1 = csv.write_data(temp_dict, write_header=False, path=path)
+			writed2 = csv.write_accumulated(temp_dict, last_accumulated=last_accumulated ,write_header=False, path=path_accumulated)
 			if not writed1 and not writed2:
 				print("\nOs dados não foram gravados pois já estão no escritos no csv!")
 			else:
