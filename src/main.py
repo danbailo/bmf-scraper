@@ -205,7 +205,8 @@ if __name__ == "__main__":
 				format_date = (month, day, year)
 				bmf.set_date(format_date)			
 
-				bmf.get_data_from_web()
+				if bmf.get_data_from_web() is False:
+					continue
 
 				prepared_data = bmf.prepare_data(filters)
 				if not prepared_data: 
