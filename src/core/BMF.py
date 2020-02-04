@@ -102,9 +102,9 @@ class BMF:
 
 				identifier = self.day + self.month + self.year + "_" + derivative + "_" + participant
 				longcontracts = int(v[0].replace(",", ""))
-				long = float(v[1])
+				long = float(v[1].replace(",", ""))
 				shortcontracts = int(v[2].replace(",", ""))
-				short = float(v[3])				
+				short = float(v[3].replace(",", ""))				
 				balance = longcontracts - shortcontracts
 
 				prepared_data[derivative]['IDENTIFICADOR'].append(identifier)
