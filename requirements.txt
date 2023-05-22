@@ -1,5 +1,5 @@
 tqdm==4.40.2
-requests==2.21.0
+requests==2.31.0
 beautifulsoup4==4.8.1
 mysql_connector_repackaged==0.3.1
 mysql-connector==2.2.9
